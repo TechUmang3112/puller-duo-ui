@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { useSelector } from "@/store/hooks";
 import Link from "next/link";
 import { styled } from "@mui/material/styles";
@@ -19,7 +19,7 @@ const Logo = () => {
       <LinkStyled href="/">
         {customizer.activeMode === "dark" ? (
           <Image
-            src="/images/logos/light-logo.svg"
+            src="/images/logos/logoP.png"
             alt="logo"
             height={customizer.TopbarHeight}
             width={174}

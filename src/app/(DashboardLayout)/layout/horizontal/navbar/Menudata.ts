@@ -550,6 +550,12 @@ const Menuitems = [
       },
       {
         id: uniqueId(),
+        title: "Form Layout 1",
+        icon: IconPoint,
+        href: "/profile",
+      },
+      {
+        id: uniqueId(),
         title: "Form Layout",
         icon: IconPoint,
         href: "/forms/form-layout",

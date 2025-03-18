@@ -65,7 +65,7 @@ import {
   IconLockAccess,
   IconAppWindow,
   IconNotebook,
-  IconFileCheck
+  IconFileCheck,
 } from "@tabler/icons-react";
 
 const Menuitems: MenuitemsType[] = [
@@ -221,7 +221,7 @@ const Menuitems: MenuitemsType[] = [
     icon: IconNotebook,
     href: "/apps/kanban",
   },
- 
+
   {
     id: uniqueId(),
     title: "Invoice",
@@ -261,9 +261,9 @@ const Menuitems: MenuitemsType[] = [
   },
   {
     id: uniqueId(),
-    title: 'Roll Base Access',
+    title: "Roll Base Access",
     icon: IconLockAccess,
-    href: '/theme-pages/casl',
+    href: "/theme-pages/casl",
   },
   {
     id: uniqueId(),
@@ -377,6 +377,12 @@ const Menuitems: MenuitemsType[] = [
   },
   {
     id: uniqueId(),
+    title: "Form Layout 1",
+    icon: IconFileDescription,
+    href: "/profile",
+  },
+  {
+    id: uniqueId(),
     title: "Form Layout",
     icon: IconFileDescription,
     href: "/forms/form-layout",
@@ -459,81 +465,81 @@ const Menuitems: MenuitemsType[] = [
   },
   {
     id: uniqueId(),
-    title: 'React Table',
+    title: "React Table",
     icon: IconBorderStyle2,
-    href: '/react-tables/basic',
+    href: "/react-tables/basic",
     children: [
       {
         id: uniqueId(),
-        title: 'Basic',
+        title: "Basic",
         icon: IconPoint,
-        href: '/react-tables/basic',
+        href: "/react-tables/basic",
       },
       {
         id: uniqueId(),
-        title: 'Dense',
+        title: "Dense",
         icon: IconPoint,
-        href: '/react-tables/dense',
+        href: "/react-tables/dense",
       },
       {
         id: uniqueId(),
-        title: 'Filter',
+        title: "Filter",
         icon: IconPoint,
-        href: '/react-tables/filter',
+        href: "/react-tables/filter",
       },
       {
         id: uniqueId(),
-        title: 'Row Selection',
+        title: "Row Selection",
         icon: IconPoint,
-        href: '/react-tables/row-selection',
+        href: "/react-tables/row-selection",
       },
       {
         id: uniqueId(),
-        title: 'Pagination',
+        title: "Pagination",
         icon: IconPoint,
-        href: '/react-tables/pagination',
+        href: "/react-tables/pagination",
       },
       {
         id: uniqueId(),
-        title: 'Sorting',
+        title: "Sorting",
         icon: IconPoint,
-        href: '/react-tables/sorting',
+        href: "/react-tables/sorting",
       },
       {
         id: uniqueId(),
-        title: 'Column Visibility',
+        title: "Column Visibility",
         icon: IconPoint,
-        href: '/react-tables/column-visiblity',
+        href: "/react-tables/column-visiblity",
       },
       {
         id: uniqueId(),
-        title: 'Drag n Drop',
+        title: "Drag n Drop",
         icon: IconPoint,
-        href: '/react-tables/drag-n-drop',
+        href: "/react-tables/drag-n-drop",
       },
       {
         id: uniqueId(),
-        title: 'Editable',
+        title: "Editable",
         icon: IconPoint,
-        href: '/react-tables/editable',
+        href: "/react-tables/editable",
       },
       {
         id: uniqueId(),
-        title: 'Empty',
+        title: "Empty",
         icon: IconPoint,
-        href: '/react-tables/empty',
+        href: "/react-tables/empty",
       },
       {
         id: uniqueId(),
-        title: 'Expand',
+        title: "Expand",
         icon: IconPoint,
-        href: '/react-tables/expanding',
+        href: "/react-tables/expanding",
       },
       {
         id: uniqueId(),
-        title: 'Sticky',
+        title: "Sticky",
         icon: IconPoint,
-        href: '/react-tables/sticky',
+        href: "/react-tables/sticky",
       },
     ],
   },

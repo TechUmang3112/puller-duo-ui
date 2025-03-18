@@ -1,7 +1,12 @@
+// Imports
+import { checkProfileStatus } from "./user.service";
+
 export function validateAuth() {
   const isLoggedIn = localStorage.getItem("isLoggedIn");
   if (!isLoggedIn) {
     window.location.replace("/logIn");
+  } else if (window.location.pathname != "/user/profile") {
+    checkProfileStatus();
   }
 }
 

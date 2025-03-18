@@ -1,21 +1,15 @@
 "use client";
-import React from "react";
-import {
-  Box,
-  FormControlLabel,
-  Button,
-  Grid,
-  MenuItem,
-  FormControl,
-  Alert,
-} from "@mui/material";
+
+// Imports
+import React, { useState, useRef } from "react";
+import { Box, Button, Grid, MenuItem, IconButton } from "@mui/material";
 import CustomTextField from "../theme-elements/CustomTextField";
 import CustomSelect from "../theme-elements/CustomSelect";
-import CustomRadio from "../theme-elements/CustomRadio";
 import CustomFormLabel from "../theme-elements/CustomFormLabel";
 import ParentCard from "../../shared/ParentCard";
-
 import BasicHeaderFormCode from "@/app/components/forms/form-layouts/code/BasicHeaderFormCode";
+import CloseIcon from "@mui/icons-material/Close";
+import { checkDocumentStatus } from "@/services/user.service";
 
 const currencies = [
   {
@@ -26,44 +20,57 @@ const currencies = [
     value: "male",
     label: "Male",
   },
-  {
-    value: "other",
-    label: "Other",
-  },
 ];
 
-const countries = [
+const user_type = [
   {
-    value: "india",
-    label: "India",
+    value: "Driver",
+    label: "Driver",
   },
   {
-    value: "uk",
-    label: "United Kingdom",
-  },
-  {
-    value: "srilanka",
-    label: "Srilanka",
+    value: "Rider",
+    label: "Rider",
   },
 ];
 
 const FbBasicHeaderForm = () => {
-  const [currency, setCurrency] = React.useState("");
-
+  const [currency, setCurrency] = useState("");
   const handleChange2 = (event: any) => {
     setCurrency(event.target.value);
   };
 
-  const [selectedValue, setSelectedValue] = React.useState("");
-
-  const handleChange3 = (event: any) => {
-    setSelectedValue(event.target.value);
+  const [userType, setUserType] = useState("");
+  const onUserTypeChange = (event: any) => {
+    setUserType(event.target.value);
   };
 
-  const [country, setCountry] = React.useState("");
+  // State for image upload
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const handleChange4 = (event: any) => {
-    setCountry(event.target.value);
+  // Ref for file input
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle image selection
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.type.startsWith("image/")) {
+      setSelectedImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    } else {
+      alert("Please upload a valid image file.");
+    }
+
+    // Clear the file input value to allow re-uploading the same file
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  // Handle image removal
+  const handleRemoveImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
   };
 
   return (
@@ -72,7 +79,7 @@ const FbBasicHeaderForm = () => {
       {/* Basic Checkbox */}
       {/* ------------------------------------------------------------------------------------------------ */}
       <ParentCard
-        title="Basic Header Form"
+        title="Update your profile"
         codeModel={<BasicHeaderFormCode />}
         footer={
           <>
@@ -85,19 +92,26 @@ const FbBasicHeaderForm = () => {
             >
               Cancel
             </Button>
-            <Button variant="contained" color="primary">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                localStorage.setItem("isProfileUpdated", "true");
+                localStorage.setItem("isDocUnderVerification", "true");
+                checkDocumentStatus();
+              }}
+            >
               Submit
             </Button>
           </>
         }
       >
         <>
-          <Alert severity="info">Person Info</Alert>
           <form>
             <Grid container spacing={3} mb={3}>
               <Grid item lg={6} md={12} sm={12}>
                 <CustomFormLabel htmlFor="fname-text">
-                  First Name
+                  Full Name
                 </CustomFormLabel>
                 <CustomTextField id="fname-text" variant="outlined" fullWidth />
                 <CustomFormLabel htmlFor="standard-select-currency">
@@ -116,39 +130,8 @@ const FbBasicHeaderForm = () => {
                     </MenuItem>
                   ))}
                 </CustomSelect>
-                <CustomFormLabel>Membership</CustomFormLabel>
-
-                <FormControl
-                  sx={{
-                    width: "100%",
-                  }}
-                >
-                  <Box>
-                    <FormControlLabel
-                      checked={selectedValue === "a"}
-                      onChange={handleChange3}
-                      value="a"
-                      label="Free"
-                      name="radio-button-demo"
-                      control={<CustomRadio />}
-                    />
-                    <FormControlLabel
-                      checked={selectedValue === "b"}
-                      onChange={handleChange3}
-                      value="b"
-                      label="Paid"
-                      control={<CustomRadio />}
-                      name="radio-button-demo"
-                    />
-                  </Box>
-                </FormControl>
               </Grid>
               <Grid item lg={6} md={12} sm={12}>
-                <CustomFormLabel htmlFor="lname-text">
-                  Last Name
-                </CustomFormLabel>
-
-                <CustomTextField id="lname-text" variant="outlined" fullWidth />
                 <CustomFormLabel htmlFor="date">Date of Birth</CustomFormLabel>
 
                 <CustomTextField
@@ -160,80 +143,77 @@ const FbBasicHeaderForm = () => {
                     shrink: true,
                   }}
                 />
+
+                <CustomFormLabel htmlFor="standard-select-currency">
+                  User type
+                </CustomFormLabel>
+                <CustomSelect
+                  id="user_type_id"
+                  value={userType}
+                  onChange={onUserTypeChange}
+                  fullWidth
+                  variant="outlined"
+                >
+                  {user_type.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </CustomSelect>
               </Grid>
             </Grid>
-          </form>
-          <Alert severity="info">Address</Alert>
-          <Grid container spacing={3} mb={3} mt={1}>
-            <Grid item lg={12} md={12} sm={12} xs={12}>
-              <CustomFormLabel
-                sx={{
-                  mt: 0,
-                }}
-                htmlFor="street-text"
-              >
-                Street
-              </CustomFormLabel>
 
-              <CustomTextField id="street-text" variant="outlined" fullWidth />
-            </Grid>
-            <Grid item lg={6} md={12} sm={12} xs={12}>
-              <CustomFormLabel
-                sx={{
-                  mt: 0,
-                }}
-                htmlFor="city-text"
-              >
-                City
-              </CustomFormLabel>
-              <CustomTextField id="city-text" variant="outlined" fullWidth />
-            </Grid>
-            <Grid item lg={6} md={12} sm={12} xs={12}>
-              <CustomFormLabel
-                sx={{
-                  mt: 0,
-                }}
-                htmlFor="state-text"
-              >
-                State
-              </CustomFormLabel>
-              <CustomTextField id="state-text" variant="outlined" fullWidth />
-            </Grid>
-            <Grid item lg={6} md={12} sm={12} xs={12}>
-              <CustomFormLabel
-                sx={{
-                  mt: 0,
-                }}
-                htmlFor="post-text"
-              >
-                Post Code
-              </CustomFormLabel>
-              <CustomTextField id="post-text" variant="outlined" fullWidth />
-            </Grid>
-            <Grid item lg={6} md={12} sm={12} xs={12}>
-              <CustomFormLabel
-                sx={{
-                  mt: 0,
-                }}
-                htmlFor="country-text"
-              >
-                Country
-              </CustomFormLabel>
-              <CustomSelect
-                id="country-select"
-                value={country}
-                onChange={handleChange4}
-                fullWidth
-                variant="outlined"
-              >
-                {countries.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </CustomSelect>
-            </Grid>
-          </Grid>
+            {/* Upload Driver License Section */}
+            {userType && (
+              <Grid container spacing={3} mb={3}>
+                <Grid item xs={12}>
+                  <input
+                    accept="image/*"
+                    id="user-doc"
+                    type="file"
+                    style={{ display: "none" }}
+                    onChange={handleImageUpload}
+                    ref={fileInputRef}
+                  />
+                  <label htmlFor="user-doc">
+                    {!imagePreview && (
+                      <Button
+                        variant="contained"
+                        component="span"
+                        color="primary"
+                        sx={{ mr: 2 }}
+                      >
+                        {userType == "Driver"
+                          ? "Upload Driver License"
+                          : "Upload Aadhaar card"}
+                      </Button>
+                    )}
+                  </label>
+                  {imagePreview && (
+                    <Box mt={2} position="relative" display="inline-block">
+                      <img
+                        src={imagePreview}
+                        alt="User doc Preview"
+                        style={{ maxWidth: "100%", maxHeight: "200px" }}
+                      />
+                      <IconButton
+                        onClick={handleRemoveImage}
+                        sx={{
+                          position: "absolute",
+                          top: 0,
+                          right: 0,
+                          color: "red",
+                          backgroundColor: "white",
+                        }}
+                      >
+                        <CloseIcon />
+                      </IconButton>
+                    </Box>
+                  )}
+                </Grid>
+              </Grid>
+            )}
+          </form>
         </>
       </ParentCard>
     </div>

@@ -73,8 +73,8 @@ const profile: ProfileType[] = [
   },
   {
     href: "/apps/notes",
-    title: "My Tasks",
-    subtitle: "To-do and Daily Tasks",
+    title: "My Rides",
+    subtitle: "Histoy & Upcoming Rides",
     icon: "/images/svgs/icon-tasks.svg",
   },
 ];
@@ -179,4 +179,4 @@ const pageLinks: LinkType[] = [
   },
 ];
 
-export { notifications,  profile, pageLinks, appsLink };
+export { notifications, profile, pageLinks, appsLink };

@@ -26,13 +26,7 @@ const DownloadCard = ({ title, children, onDownload }: any) => {
           padding: "16px",
         }}
         title={title}
-        action={
-          <Tooltip title="Download" placement="left">
-            <IconButton onClick={onDownload}>
-              <IconDownload />
-            </IconButton>
-          </Tooltip>
-        }
+        action={<Tooltip title="Download" placement="left"></Tooltip>}
       />
       <Divider />
       {children}

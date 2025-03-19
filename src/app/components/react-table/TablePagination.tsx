@@ -1,31 +1,28 @@
 "use client";
-import * as React from "react";
+
+// Imports
+import React, { useEffect } from "react";
 import {
   TableContainer,
   Table,
   TableRow,
   TableCell,
   TableBody,
-  Avatar,
   Typography,
   TableHead,
   Chip,
   Box,
   Grid,
   MenuItem,
-  Button,
   Divider,
   IconButton,
-  AvatarGroup,
 } from "@mui/material";
 import { Stack } from "@mui/system";
-
 import DownloadCard from "@/app/components/shared/DownloadCard";
 import {
   basicsTableData,
   PaginationDataType,
 } from "@/app/(DashboardLayout)/react-tables/pagination/PaginationData";
-
 import {
   flexRender,
   getCoreRowModel,
@@ -43,50 +40,71 @@ import {
   IconChevronsLeft,
   IconChevronsRight,
 } from "@tabler/icons-react";
+import { jsonDateToReadbaleFormat } from "@/services/date.service";
+import Disabled from "../ui-components/rating/Disabled";
 
 const basics = basicsTableData;
 
 const columnHelper = createColumnHelper<PaginationDataType>();
 
 const columns = [
-  columnHelper.accessor("name", {
-    header: () => "User",
-    cell: (info) => (
-      <Stack direction="row" alignItems="center" spacing={2}>
-        <Avatar
-          src={info.row.original.avatar}
-          alt={info.row.original.avatar}
-          sx={{ width: 42, height: 42 }}
-        />
-        <Box>
-          <Typography variant="h6">{info.getValue()}</Typography>
-        </Box>
-      </Stack>
-    ),
+  columnHelper.accessor("Date", {
+    header: () => "Date",
+    cell: (info: any) => {
+      console.log("info", info);
+
+      return (
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <Box>
+            <Typography variant="h6">
+              {jsonDateToReadbaleFormat(info.getValue())}
+            </Typography>
+          </Box>
+        </Stack>
+      );
+    },
   }),
-  columnHelper.accessor("project", {
-    header: () => "Project Name",
+
+  columnHelper.accessor("Starting point", {
+    header: () => "Starting point",
     cell: (info) => (
       <Typography variant="subtitle1" color="textSecondary">
         {info.getValue()}
       </Typography>
     ),
   }),
-  columnHelper.accessor("users", {
-    header: () => "Users",
+
+  columnHelper.accessor("Ending point", {
+    header: () => "Ending point",
     cell: (info) => (
-      <AvatarGroup sx={{ justifyContent: "start" }}>
-        {info.getValue().map((user, i) => (
-          <Avatar
-            src={user.img}
-            alt={user.img}
-            key={i}
-            sx={{ width: 35, height: 35 }}
-          />
-        ))}
-      </AvatarGroup>
+      <Typography variant="subtitle1" color="textSecondary">
+        {info.getValue()}
+      </Typography>
     ),
   }),
+
+  columnHelper.accessor("Ride cost", {
+    header: () => "Ride cost",
+    cell: (info) => (
+      <Typography variant="subtitle1" color="textSecondary">
+        Rs. {info.getValue()}
+      </Typography>
+    ),
+  }),
+
+  columnHelper.accessor("Rating", {
+    header: () => "Rating",
+    cell: (info) => {
+      if (info.getValue()) {
+        return (
+          <Grid item xs={12} lg={4} sm={6} display="flex" alignItems="stretch">
+            <Disabled />
+          </Grid>
+        );
+      } else return <></>;
+    },
+  }),
+
   columnHelper.accessor("status", {
     header: () => "Status",
     meta: {
@@ -126,8 +144,6 @@ const columns = [
 const TablePagination = () => {
   const [data, _setData] = React.useState(() => [...basics]);
   const [columnFilters, setColumnFilters] = React.useState<any>([]);
-  const rerender = React.useReducer(() => ({}), {})[1];
-
   const table = useReactTable({
     data,
     columns,
@@ -145,35 +161,12 @@ const TablePagination = () => {
     debugColumns: false,
   });
 
-  const handleDownload = () => {
-    const headers = ["avatar", "name", "project", "percent", "status", "users"];
-    const rows = data.map((item) => [
-      item.name,
-      item.project,
-      item.percent,
-      item.status,
-      item.avatar,
-      item.users.map((user) => user.img).join(","),
-    ]);
-
-    const csvContent = [
-      headers.join(","),
-      ...rows.map((e) => e.join(",")),
-    ].join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "table-data.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  useEffect(() => {
+    table.setPageSize(5);
+  });
 
   return (
-    <DownloadCard title="Pagination Table" onDownload={handleDownload}>
+    <DownloadCard title="My Rides">
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Box>
@@ -241,15 +234,8 @@ const TablePagination = () => {
               justifyContent="space-between"
             >
               <Box display="flex" alignItems="center" gap={1}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => rerender()}
-                >
-                  Force Rerender
-                </Button>
                 <Typography variant="body1">
-                  {table.getPrePaginationRowModel().rows.length} Rows
+                  {table.getPrePaginationRowModel().rows.length} Rides
                 </Typography>
               </Box>
               <Box
@@ -290,7 +276,7 @@ const TablePagination = () => {
                     table.setPageSize(Number(e.target.value));
                   }}
                 >
-                  {[10, 15, 20, 25].map((pageSize) => (
+                  {[5, 10, 15, 20, 25].map((pageSize) => (
                     <MenuItem key={pageSize} value={pageSize}>
                       {pageSize}
                     </MenuItem>

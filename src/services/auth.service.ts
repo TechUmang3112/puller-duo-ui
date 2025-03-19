@@ -11,6 +11,9 @@ export function validateAuth() {
 }
 
 export function successfulLogIn() {
+  localStorage.removeItem("isProfileUpdated");
+  localStorage.removeItem("isDocUnderVerification");
+
   localStorage.setItem("isLoggedIn", "true");
   window.location.replace("/");
 }

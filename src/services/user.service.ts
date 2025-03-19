@@ -8,6 +8,7 @@ export function checkProfileStatus() {
 }
 
 export function checkDocumentStatus() {
+  return {};
   const isProfileUpdated = localStorage.getItem("isDocUnderVerification");
   if (
     isProfileUpdated &&

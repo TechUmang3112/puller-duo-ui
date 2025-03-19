@@ -1,4 +1,6 @@
 "use client";
+
+// Imports
 import { Box, Typography, Button } from "@mui/material";
 import Link from "next/link";
 import CustomTextField from "@/app/components/forms/theme-elements/CustomTextField";
@@ -83,9 +85,10 @@ const AuthTwoSteps = () => {
                 }}
                 sx={{
                   "& input": {
-                    textAlign: "center", // Ensure text is centered
-                    fontSize: "1.5rem", // Optional: Increase font size for better visibility
+                    textAlign: "center",
+                    fontSize: { xs: "1rem", sm: "1.5rem" }, // Responsive font size
                   },
+                  width: { xs: "40px", sm: "56px" }, // Responsive width
                 }}
               />
             ))}

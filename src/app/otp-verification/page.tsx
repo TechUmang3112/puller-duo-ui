@@ -1,7 +1,7 @@
 // Imports
+import AuthTwoSteps from "../auth/authForms/AuthTwoSteps";
 import { Grid, Box, Card, Typography } from "@mui/material";
 import PageContainer from "@/app/components/container/PageContainer";
-import AuthTwoSteps from "../auth/authForms/AuthTwoSteps";
 
 export default function TwoSteps2() {
   return (

@@ -1,7 +1,6 @@
 // Imports
 import { Grid } from "@mui/material";
 import {
-  FbOrdinaryForm,
   FbDefaultForm,
   FbBasicHeaderForm,
   FbReadonlyForm,
@@ -31,9 +30,6 @@ const FormLayouts = () => (
     {/* end breadcrumb */}
 
     <Grid container spacing={3}>
-      <Grid item lg={12} md={12} xs={12}>
-        <FbOrdinaryForm />
-      </Grid>
       <Grid item lg={12} md={12} xs={12}>
         <FbInputVariants />
       </Grid>

@@ -1,8 +1,8 @@
+// Imports
 import { configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "redux";
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-
 import counterReducer from "./counter/counterSlice";
 import CustomizerReducer from "./customizer/CustomizerSlice";
 import EcommerceReducer from "./apps/eCommerce/ECommerceSlice";
@@ -13,6 +13,7 @@ import TicketReducer from "./apps/tickets/TicketSlice";
 import ContactsReducer from "./apps/contacts/ContactSlice";
 import UserProfileReducer from "./apps/userProfile/UserProfileSlice";
 import BlogReducer from "./apps/blog/BlogSlice";
+import userReducer from "./user/UserReducer";
 
 const persistConfig = {
   key: "root",
@@ -21,6 +22,7 @@ const persistConfig = {
 
 export const store = configureStore({
   reducer: {
+    userReducer: userReducer,
     counter: counterReducer,
     customizer: persistReducer<any>(persistConfig, CustomizerReducer),
     ecommerceReducer: EcommerceReducer,
@@ -38,6 +40,7 @@ export const store = configureStore({
 });
 
 const rootReducer = combineReducers({
+  userReducer: userReducer,
   counter: counterReducer,
   customizer: CustomizerReducer,
   ecommerceReducer: EcommerceReducer,

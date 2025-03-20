@@ -11,9 +11,13 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import ComboBoxAutocomplete from "../forms/form-elements/autoComplete/ComboBoxAutocomplete";
 import { format } from "date-fns"; // Import format from date-fns
 import { enGB } from "date-fns/locale"; // Import the locale for DD/MM/YYYY format
+import { UserState } from "@/store/user/UserReducer";
+import { useSelector } from "@/store/hooks";
+import ChargesForRide from "./ChargesForRide";
 
 const OfferRideForm = () => {
   const [dateValue, setDateValue] = React.useState(null);
+  const userState: UserState = useSelector((state) => state.userReducer);
 
   // Format the date value to DD/MM/YYYY HH:mm AM/PM
   const formattedDate = dateValue
@@ -23,11 +27,14 @@ const OfferRideForm = () => {
   return (
     <>
       <Grid item xs={12} lg={4} sm={6} display="flex" alignItems="stretch">
-        <ChildCard title="Offer the ride">
+        <ChildCard
+          title={
+            userState.type == "Driver" ? "Offer the ride" : "Find the ride"
+          }
+        >
           <ComboBoxAutocomplete placeholder="Leaving from ..." />
           <Box sx={{ my: 2 }} />
           <ComboBoxAutocomplete placeholder="Going to ..." />
-
           {/* Display Total Distance and Total Time */}
           <Box sx={{ my: 2 }}>
             <Typography variant="body1">
@@ -50,7 +57,6 @@ const OfferRideForm = () => {
               </Typography>
             </Typography>
           </Box>
-
           <Box sx={{ my: 2 }} />
           <LocalizationProvider
             dateAdapter={AdapterDateFns}
@@ -84,19 +90,11 @@ const OfferRideForm = () => {
             />
           </LocalizationProvider>
 
-          <Box sx={{ my: 2 }} />
-          <CustomTextField
-            id="email"
-            variant="outlined"
-            placeholder="Charges for the ride"
-            fullWidth
-            value={""}
-            onChange={(e: any) => {}}
-          />
+          <ChargesForRide />
 
           <Box sx={{ my: 4 }} />
           <Button variant="contained" color="primary">
-            Offer the ride
+            {userState.type == "Driver" ? "Offer the ride" : "Find the ride"}
           </Button>
         </ChildCard>
       </Grid>

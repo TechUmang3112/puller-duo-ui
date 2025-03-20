@@ -1,3 +1,4 @@
+// Imports
 import React, { useState } from "react";
 import Link from "next/link";
 import {
@@ -10,10 +11,8 @@ import {
   IconButton,
 } from "@mui/material";
 import * as dropdownData from "./data";
-
 import { IconMail } from "@tabler/icons-react";
 import { Stack } from "@mui/system";
-import Image from "next/image";
 import { logoutFromApp } from "@/services/auth.service";
 
 const Profile = () => {

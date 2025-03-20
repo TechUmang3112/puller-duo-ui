@@ -6,6 +6,7 @@ import Grid from "@mui/material/Grid";
 import { useEffect, useState } from "react";
 import PageContainer from "@/app/components/container/PageContainer";
 import OfferRideForm from "../components/offer-ride-form/OfferRideForm";
+import RideResults from "../components/ride-results/RideResults";
 
 export default function Dashboard() {
   const [isLoading, setLoading] = useState(true);
@@ -26,6 +27,8 @@ export default function Dashboard() {
           {/* Centering OfferRideForm */}
 
           <OfferRideForm />
+
+          <RideResults />
         </Grid>
       </Box>
     </PageContainer>

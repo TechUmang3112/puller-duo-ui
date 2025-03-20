@@ -10,6 +10,8 @@ import ParentCard from "../../shared/ParentCard";
 import BasicHeaderFormCode from "@/app/components/forms/form-layouts/code/BasicHeaderFormCode";
 import CloseIcon from "@mui/icons-material/Close";
 import { checkDocumentStatus } from "@/services/user.service";
+import { useDispatch } from "@/store/hooks";
+import { setType } from "@/store/user/UserReducer";
 
 const currencies = [
   {
@@ -34,6 +36,8 @@ const user_type = [
 ];
 
 const FbBasicHeaderForm = () => {
+  const dispatch = useDispatch();
+
   const [currency, setCurrency] = useState("");
   const handleChange2 = (event: any) => {
     setCurrency(event.target.value);
@@ -42,6 +46,7 @@ const FbBasicHeaderForm = () => {
   const [userType, setUserType] = useState("");
   const onUserTypeChange = (event: any) => {
     setUserType(event.target.value);
+    dispatch(setType(event.target.value));
   };
 
   // State for image upload

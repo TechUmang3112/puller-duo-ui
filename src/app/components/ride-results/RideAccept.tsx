@@ -1,3 +1,4 @@
+// Imports
 import React from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -27,6 +28,7 @@ const RideDialog: React.FC<RideDialogProps> = ({ open, onClose, onAccept }) => {
   const handleAccept = () => {
     onAccept(); // Call the onAccept handler from props
     setOpenSnackbar(true);
+    window.location.href = "/user/myRides";
   };
 
   const handleSnackbarClose = (

@@ -1,3 +1,4 @@
+// Imports
 import { uniqueId } from "lodash";
 
 interface MenuitemsType {
@@ -15,48 +16,23 @@ interface MenuitemsType {
   external?: boolean;
 }
 import {
-  IconAward,
-  IconBoxMultiple,
   IconPoint,
-  IconAlertCircle,
-  IconNotes,
-  IconCalendar,
-  IconMail,
-  IconTicket,
   IconEdit,
-  IconGitMerge,
-  IconCurrencyDollar,
   IconApps,
   IconFileDescription,
   IconFileDots,
   IconFiles,
-  IconBan,
-  IconStar,
-  IconMoodSmile,
   IconBorderAll,
   IconBorderHorizontal,
   IconBorderInner,
   IconBorderVertical,
   IconBorderTop,
   IconUserCircle,
-  IconPackage,
-  IconMessage2,
-  IconBasket,
-  IconChartLine,
-  IconChartArcs,
-  IconChartCandle,
-  IconChartArea,
-  IconChartDots,
-  IconChartDonut3,
-  IconChartRadar,
   IconLogin,
   IconUserPlus,
   IconRotate,
   IconBox,
-  IconShoppingCart,
   IconAperture,
-  IconLayout,
-  IconSettings,
   IconHelp,
   IconZoomCode,
   IconBoxAlignBottom,
@@ -64,8 +40,10 @@ import {
   IconBorderStyle2,
   IconLockAccess,
   IconAppWindow,
-  IconNotebook,
   IconFileCheck,
+  IconCalendar,
+  IconCar,
+  IconList,
 } from "@tabler/icons-react";
 
 const Menuitems: MenuitemsType[] = [
@@ -73,92 +51,45 @@ const Menuitems: MenuitemsType[] = [
     navlabel: true,
     subheader: "Home",
   },
-
   {
     id: uniqueId(),
-    title: "Modern",
+    title: "Dashboard",
     icon: IconAperture,
     href: "/",
-    chip: "New",
+    chipColor: "secondary",
+  },
+
+  {
+    navlabel: true,
+    subheader: "Rides",
+  },
+  {
+    id: uniqueId(),
+    title: "My Rides",
+    icon: IconList,
+    href: "/user/myRides",
     chipColor: "secondary",
   },
   {
     id: uniqueId(),
-    title: "eCommerce",
-    icon: IconShoppingCart,
-    href: "/dashboards/ecommerce",
+    title: "Current Ride",
+    icon: IconCar,
+    href: "/user/currentRide",
+    chipColor: "secondary",
   },
+  {
+    id: uniqueId(),
+    title: "Upcoming Rides",
+    icon: IconCalendar,
+    href: "/user/upcomingRides",
+    chipColor: "secondary",
+  },
+
   {
     navlabel: true,
     subheader: "Apps",
   },
-  {
-    id: uniqueId(),
-    title: "Contacts",
-    icon: IconPackage,
-    chip: "2",
-    chipColor: "secondary",
-    href: "/apps/contacts",
-  },
 
-  {
-    id: uniqueId(),
-    title: "Blog",
-    icon: IconChartDonut3,
-    href: "/apps/blog/",
-    children: [
-      {
-        id: uniqueId(),
-        title: "Posts",
-        icon: IconPoint,
-        href: "/apps/blog/post",
-      },
-      {
-        id: uniqueId(),
-        title: "Detail",
-        icon: IconPoint,
-        href: "/apps/blog/detail/streaming-video-way-before-it-was-cool-go-dark-tomorrow",
-      },
-    ],
-  },
-  {
-    id: uniqueId(),
-    title: "Ecommerce",
-    icon: IconBasket,
-    href: "/apps/ecommerce/",
-    children: [
-      {
-        id: uniqueId(),
-        title: "Shop",
-        icon: IconPoint,
-        href: "/apps/ecommerce/shop",
-      },
-      {
-        id: uniqueId(),
-        title: "Detail",
-        icon: IconPoint,
-        href: "/apps/ecommerce/detail/1",
-      },
-      {
-        id: uniqueId(),
-        title: "List",
-        icon: IconPoint,
-        href: "/apps/ecommerce/list",
-      },
-      {
-        id: uniqueId(),
-        title: "Checkout",
-        icon: IconPoint,
-        href: "/apps/ecommerce/checkout",
-      },
-    ],
-  },
-  {
-    id: uniqueId(),
-    title: "Chats",
-    icon: IconMessage2,
-    href: "/apps/chats",
-  },
   {
     id: uniqueId(),
     title: "Users",
@@ -190,36 +121,6 @@ const Menuitems: MenuitemsType[] = [
         href: "/apps/user-profile/gallery",
       },
     ],
-  },
-  {
-    id: uniqueId(),
-    title: "Notes",
-    icon: IconNotes,
-    href: "/apps/notes",
-  },
-  {
-    id: uniqueId(),
-    title: "Calendar",
-    icon: IconCalendar,
-    href: "/apps/calendar",
-  },
-  {
-    id: uniqueId(),
-    title: "Email",
-    icon: IconMail,
-    href: "/apps/email",
-  },
-  {
-    id: uniqueId(),
-    title: "Tickets",
-    icon: IconTicket,
-    href: "/apps/tickets",
-  },
-  {
-    id: uniqueId(),
-    title: "Kanban",
-    icon: IconNotebook,
-    href: "/apps/kanban",
   },
 
   {
@@ -267,24 +168,6 @@ const Menuitems: MenuitemsType[] = [
   },
   {
     id: uniqueId(),
-    title: "Treeview",
-    icon: IconGitMerge,
-    href: "/theme-pages/treeview",
-  },
-  {
-    id: uniqueId(),
-    title: "Pricing",
-    icon: IconCurrencyDollar,
-    href: "/theme-pages/pricing",
-  },
-  {
-    id: uniqueId(),
-    title: "Account Setting",
-    icon: IconUserCircle,
-    href: "/theme-pages/account-settings",
-  },
-  {
-    id: uniqueId(),
     title: "FAQ",
     icon: IconHelp,
     href: "/theme-pages/faq",
@@ -295,32 +178,7 @@ const Menuitems: MenuitemsType[] = [
     icon: IconAppWindow,
     href: "/landingpage",
   },
-  {
-    id: uniqueId(),
-    title: "Widgets",
-    icon: IconLayout,
-    href: "/widgets/cards",
-    children: [
-      {
-        id: uniqueId(),
-        title: "Cards",
-        icon: IconPoint,
-        href: "/widgets/cards",
-      },
-      {
-        id: uniqueId(),
-        title: "Banners",
-        icon: IconPoint,
-        href: "/widgets/banners",
-      },
-      {
-        id: uniqueId(),
-        title: "Charts",
-        icon: IconPoint,
-        href: "/widgets/charts",
-      },
-    ],
-  },
+
   {
     navlabel: true,
     subheader: "Forms",
@@ -627,53 +485,6 @@ const Menuitems: MenuitemsType[] = [
       },
     ],
   },
-
-  {
-    navlabel: true,
-    subheader: "Charts",
-  },
-  {
-    id: uniqueId(),
-    title: "Line",
-    icon: IconChartLine,
-    href: "/charts/line",
-  },
-  {
-    id: uniqueId(),
-    title: "Gradient",
-    icon: IconChartArcs,
-    href: "/charts/gradient",
-  },
-  {
-    id: uniqueId(),
-    title: "Area",
-    icon: IconChartArea,
-    href: "/charts/area",
-  },
-  {
-    id: uniqueId(),
-    title: "Candlestick",
-    icon: IconChartCandle,
-    href: "/charts/candlestick",
-  },
-  {
-    id: uniqueId(),
-    title: "Column",
-    icon: IconChartDots,
-    href: "/charts/column",
-  },
-  {
-    id: uniqueId(),
-    title: "Doughtnut & Pie",
-    icon: IconChartDonut3,
-    href: "/charts/doughnut",
-  },
-  {
-    id: uniqueId(),
-    title: "RadialBar & Radar",
-    icon: IconChartRadar,
-    href: "/charts/radialbar",
-  },
   {
     navlabel: true,
     subheader: "Auth",
@@ -759,110 +570,6 @@ const Menuitems: MenuitemsType[] = [
         href: "/auth/auth2/two-steps",
       },
     ],
-  },
-  {
-    id: uniqueId(),
-    title: "Error",
-    icon: IconAlertCircle,
-    href: "/auth/error",
-  },
-  {
-    id: uniqueId(),
-    title: "Maintenance",
-    icon: IconSettings,
-    href: "/auth/maintenance",
-  },
-
-  {
-    navlabel: true,
-    subheader: "Other",
-  },
-  {
-    id: uniqueId(),
-    title: "Menu Level",
-    icon: IconBoxMultiple,
-    href: "/menulevel/",
-    children: [
-      {
-        id: uniqueId(),
-        title: "Level 1",
-        icon: IconPoint,
-        href: "/l1",
-      },
-      {
-        id: uniqueId(),
-        title: "Level 1.1",
-        icon: IconPoint,
-        href: "/l1.1",
-        children: [
-          {
-            id: uniqueId(),
-            title: "Level 2",
-            icon: IconPoint,
-            href: "/l2",
-          },
-          {
-            id: uniqueId(),
-            title: "Level 2.1",
-            icon: IconPoint,
-            href: "/l2.1",
-            children: [
-              {
-                id: uniqueId(),
-                title: "Level 3",
-                icon: IconPoint,
-                href: "/l3",
-              },
-              {
-                id: uniqueId(),
-                title: "Level 3.1",
-                icon: IconPoint,
-                href: "/l3.1",
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: uniqueId(),
-    title: "Disabled",
-    icon: IconBan,
-    href: "",
-    disabled: true,
-  },
-  {
-    id: uniqueId(),
-    title: "SubCaption",
-    subtitle: "This is the sutitle",
-    icon: IconStar,
-    href: "",
-  },
-
-  {
-    id: uniqueId(),
-    title: "Chip",
-    icon: IconAward,
-    href: "",
-    chip: "9",
-    chipColor: "primary",
-  },
-  {
-    id: uniqueId(),
-    title: "Outlined",
-    icon: IconMoodSmile,
-    href: "",
-    chip: "outline",
-    variant: "outlined",
-    chipColor: "primary",
-  },
-  {
-    id: uniqueId(),
-    title: "External Link",
-    external: true,
-    icon: IconStar,
-    href: "https://google.com",
   },
 ];
 

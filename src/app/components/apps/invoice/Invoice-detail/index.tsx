@@ -1,10 +1,10 @@
 "use client";
+
+// Imports
 import React, { useContext, useEffect, useState } from "react";
 import { InvoiceContext } from "@/app/context/InvoiceContext/index";
 import { usePathname } from "next/navigation";
 import {
-  Card,
-  CardContent,
   Typography,
   Button,
   Table,
@@ -14,7 +14,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Badge,
   Box,
   Stack,
   Chip,
@@ -65,17 +64,19 @@ const InvoiceDetail = () => {
   return (
     <>
       <Stack
-        direction={{ xs: 'column', sm: 'row' }}
+        direction={{ xs: "column", sm: "row" }}
         alignItems="center"
         justifyContent="space-between"
         mb={2}
       >
-        <Box sx={{
-          textAlign: {
-            xs: "center",
-            sm: "left"
-          }
-        }}>
+        <Box
+          sx={{
+            textAlign: {
+              xs: "center",
+              sm: "left",
+            },
+          }}
+        >
           <Typography variant="h5"># {selectedInvoice.id}</Typography>
           <Box mt={1}>
             <Chip
@@ -88,17 +89,6 @@ const InvoiceDetail = () => {
         </Box>
 
         <Logo />
-        <Box textAlign="right">
-          {selectedInvoice.status === "Shipped" ? (
-            <Chip size="small" color="primary" label={selectedInvoice.status} />
-          ) : selectedInvoice.status === "Delivered" ? (
-            <Chip size="small" color="success" label={selectedInvoice.status} />
-          ) : selectedInvoice.status === "Pending" ? (
-            <Chip size="small" color="warning" label={selectedInvoice.status} />
-          ) : (
-            ""
-          )}
-        </Box>
       </Stack>
       <Divider></Divider>
 
@@ -109,18 +99,9 @@ const InvoiceDetail = () => {
               <Typography variant="h6" mb={2}>
                 From :
               </Typography>
-              <Typography variant="body1">
-                {selectedInvoice.billFrom}
-              </Typography>
-              <Typography variant="body1">
-                {selectedInvoice.billFromEmail}
-              </Typography>
-              <Typography variant="body1">
-                {selectedInvoice.billFromAddress}
-              </Typography>
-              <Typography variant="body1">
-                {selectedInvoice.billFromPhone}
-              </Typography>
+              <Typography variant="body1">PullerDuo Inc.</Typography>
+              <Typography variant="body1">puller.duo@gmail.com</Typography>
+              <Typography variant="body1">Ahmedabad, Gujarat, India</Typography>
             </Box>
           </Paper>
         </Grid>
@@ -130,16 +111,9 @@ const InvoiceDetail = () => {
               <Typography variant="h6" mb={2}>
                 To :
               </Typography>
-              <Typography variant="body1">{selectedInvoice.billTo}</Typography>
-              <Typography variant="body1">
-                {selectedInvoice.billToEmail}
-              </Typography>
-              <Typography variant="body1">
-                {selectedInvoice.billToAddress}
-              </Typography>
-              <Typography variant="body1">
-                {selectedInvoice.billToPhone}
-              </Typography>
+              <Typography variant="body1">Umang Patel</Typography>
+              <Typography variant="body1">umang@gmail.com</Typography>
+              <Typography variant="body1">Rider</Typography>
             </Box>
           </Paper>
         </Grid>
@@ -152,22 +126,22 @@ const InvoiceDetail = () => {
               <TableRow>
                 <TableCell>
                   <Typography variant="h6" fontSize="14px">
-                    Item Name
+                    Starting point
                   </Typography>
                 </TableCell>
                 <TableCell>
                   <Typography variant="h6" fontSize="14px">
-                    Unit Price
+                    Ending point
                   </Typography>
                 </TableCell>
                 <TableCell>
                   <Typography variant="h6" fontSize="14px">
-                    Unit
+                    Total KM
                   </Typography>
                 </TableCell>
                 <TableCell align="right">
                   <Typography variant="h6" fontSize="14px">
-                    Total Cost
+                    Total Time
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -208,7 +182,7 @@ const InvoiceDetail = () => {
       <Box p={3} bgcolor="primary.light" mt={3}>
         <Box display="flex" justifyContent="end" gap={3} mb={3}>
           <Typography variant="body1" fontWeight={600}>
-            Sub Total:
+            Driver Wage:
           </Typography>
           <Typography variant="body1" fontWeight={600}>
             {selectedInvoice.totalCost}
@@ -216,7 +190,7 @@ const InvoiceDetail = () => {
         </Box>
         <Box display="flex" justifyContent="end" gap={3} mb={3}>
           <Typography variant="body1" fontWeight={600}>
-            Vat:
+            Platform fee:
           </Typography>
           <Typography variant="body1" fontWeight={600}>
             {selectedInvoice.vat}
@@ -244,7 +218,7 @@ const InvoiceDetail = () => {
           component={Link}
           href={`/apps/invoice/edit/${selectedInvoice.billFrom}`}
         >
-          Edit Invoice
+          Cancel payment
         </Button>
         <Button
           variant="contained"
@@ -252,7 +226,7 @@ const InvoiceDetail = () => {
           component={Link}
           href="/apps/invoice/list"
         >
-          Back to Invoice List
+          Pay now
         </Button>
       </Box>
     </>

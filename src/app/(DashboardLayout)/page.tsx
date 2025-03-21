@@ -1,12 +1,13 @@
 "use client";
 
 // Imports
-import Box from "@mui/material/Box";
+import { Box } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { useEffect, useState } from "react";
+import RideResults from "../components/ride-results/RideResults";
+import RideInsights from "../components/ride-results/RideInsights";
 import PageContainer from "@/app/components/container/PageContainer";
 import OfferRideForm from "../components/offer-ride-form/OfferRideForm";
-import RideResults from "../components/ride-results/RideResults";
 
 export default function Dashboard() {
   const [isLoading, setLoading] = useState(true);
@@ -16,19 +17,16 @@ export default function Dashboard() {
 
   return (
     <PageContainer title="Dashboard" description="this is Dashboard">
-      <Box
-        mt={3}
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="80vh" // Adjust this value as needed
-      >
-        <Grid container justifyContent="center">
-          {/* Centering OfferRideForm */}
+      <Box>
+        <RideInsights />
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={12}>
+            <OfferRideForm />
+          </Grid>
 
-          <OfferRideForm />
-
-          <RideResults />
+          <Grid item xs={6} md={12}>
+            <RideResults />
+          </Grid>
         </Grid>
       </Box>
     </PageContainer>

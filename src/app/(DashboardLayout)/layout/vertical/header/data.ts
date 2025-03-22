@@ -66,8 +66,8 @@ const profile: ProfileType[] = [
     icon: "/images/svgs/icon-account.svg",
   },
   {
-    href: "/apps/email",
-    title: "My Inbox",
+    href: "/user/notifications",
+    title: "My Notifications",
     subtitle: "Messages & Emails",
     icon: "/images/svgs/icon-inbox.svg",
   },

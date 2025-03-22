@@ -7,14 +7,15 @@ import {
   Tooltip,
   useMediaQuery,
 } from "@mui/material";
-import Link from "next/link";
+import { AppState } from "@/store/store";
 import { useSelector } from "@/store/hooks";
 import { IconPower } from "@tabler/icons-react";
-import { AppState } from "@/store/store";
 import { logoutFromApp } from "@/services/auth.service";
 
 export const Profile = () => {
   const customizer = useSelector((state: AppState) => state.customizer);
+  const userState = useSelector((state: AppState) => state.userReducer);
+
   const lgUp = useMediaQuery((theme: any) => theme.breakpoints.up("lg"));
   const hideMenu = lgUp
     ? customizer.isCollapse && !customizer.isSidebarHover
@@ -36,7 +37,7 @@ export const Profile = () => {
           />
 
           <Box>
-            <Typography variant="h6">Umang</Typography>
+            <Typography variant="h6">{userState.name.split(" ")[0]}</Typography>
             <Typography variant="caption">Rider</Typography>
           </Box>
           <Box sx={{ ml: "auto" }}>

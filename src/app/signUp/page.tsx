@@ -2,9 +2,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { APP_NAME } from "@/constants/strings";
+import AuthRegister from "../auth/authForms/AuthRegister";
 import { Grid, Box, Stack, Typography } from "@mui/material";
 import PageContainer from "@/app/components/container/PageContainer";
-import AuthRegister from "../auth/authForms/AuthRegister";
 
 export default function LogIn() {
   return (

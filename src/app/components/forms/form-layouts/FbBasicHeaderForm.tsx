@@ -1,25 +1,29 @@
 "use client";
 
 // Imports
+import FormData from "form-data";
 import React, { useState, useRef } from "react";
 import { Box, Button, Grid, MenuItem, IconButton } from "@mui/material";
 import CustomTextField from "../theme-elements/CustomTextField";
 import CustomSelect from "../theme-elements/CustomSelect";
 import CustomFormLabel from "../theme-elements/CustomFormLabel";
 import ParentCard from "../../shared/ParentCard";
-import BasicHeaderFormCode from "@/app/components/forms/form-layouts/code/BasicHeaderFormCode";
 import CloseIcon from "@mui/icons-material/Close";
 import { checkDocumentStatus } from "@/services/user.service";
-import { useDispatch } from "@/store/hooks";
-import { setType } from "@/store/user/UserReducer";
+import { useDispatch, useSelector } from "@/store/hooks";
+import { setIsAuthLoading, setType } from "@/store/user/UserReducer";
+import { nUser } from "@/constants/network";
+import { post } from "@/services/api.service";
+import { IconTrash } from "@tabler/icons-react";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 const currencies = [
   {
-    value: "female",
+    value: "Female",
     label: "Female",
   },
   {
-    value: "male",
+    value: "Male",
     label: "Male",
   },
 ];
@@ -37,6 +41,9 @@ const user_type = [
 
 const FbBasicHeaderForm = () => {
   const dispatch = useDispatch();
+  const userState = useSelector((state) => state.userReducer);
+
+  const [name, setName] = useState("");
 
   const [currency, setCurrency] = useState("");
   const handleChange2 = (event: any) => {
@@ -78,6 +85,26 @@ const FbBasicHeaderForm = () => {
     setImagePreview(null);
   };
 
+  async function updateProfile() {
+    dispatch(setIsAuthLoading(true));
+
+    const body = new FormData();
+    body.append("userId", localStorage.getItem("userId"));
+    body.append("name", name);
+    body.append("type", userType == "Driver" ? "1" : "0");
+    body.append("gender", currency == "Male" ? "0" : "1");
+    body.append("file", selectedImage);
+
+    const response = await post(nUser.updateProfile, body, {
+      "Content-Type": "multipart/form-data",
+    });
+    dispatch(setIsAuthLoading(false));
+
+    localStorage.setItem("isProfileUpdated", "true");
+    localStorage.setItem("isDocUnderVerification", "true");
+    window.location.replace("/user/verification-pending");
+  }
+
   return (
     <div>
       {/* ------------------------------------------------------------------------------------------------ */}
@@ -85,10 +112,10 @@ const FbBasicHeaderForm = () => {
       {/* ------------------------------------------------------------------------------------------------ */}
       <ParentCard
         title="Update your profile"
-        codeModel={<BasicHeaderFormCode />}
         footer={
           <>
             <Button
+              disabled={userState.isAuthLoading}
               variant="contained"
               color="error"
               sx={{
@@ -97,17 +124,29 @@ const FbBasicHeaderForm = () => {
             >
               Cancel
             </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                localStorage.setItem("isProfileUpdated", "true");
-                localStorage.setItem("isDocUnderVerification", "true");
-                checkDocumentStatus();
-              }}
-            >
-              Submit
-            </Button>
+
+            {!userState.isAuthLoading && (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  updateProfile();
+                }}
+              >
+                Submit
+              </Button>
+            )}
+
+            {userState.isAuthLoading && (
+              <LoadingButton
+                loading
+                variant="contained"
+                color="secondary"
+                endIcon={<IconTrash width={18} />}
+              >
+                Loading
+              </LoadingButton>
+            )}
           </>
         }
       >
@@ -118,11 +157,20 @@ const FbBasicHeaderForm = () => {
                 <CustomFormLabel htmlFor="fname-text">
                   Full Name
                 </CustomFormLabel>
-                <CustomTextField id="fname-text" variant="outlined" fullWidth />
+                <CustomTextField
+                  disabled={userState.isAuthLoading}
+                  onChange={(e: any) => {
+                    setName(e.target.value);
+                  }}
+                  id="fname-text"
+                  variant="outlined"
+                  fullWidth
+                />
                 <CustomFormLabel htmlFor="standard-select-currency">
                   Select Gender
                 </CustomFormLabel>
                 <CustomSelect
+                  disabled={userState.isAuthLoading}
                   id="standard-select-currency"
                   value={currency}
                   onChange={handleChange2}
@@ -140,6 +188,7 @@ const FbBasicHeaderForm = () => {
                 <CustomFormLabel htmlFor="date">Date of Birth</CustomFormLabel>
 
                 <CustomTextField
+                  disabled={userState.isAuthLoading}
                   id="date"
                   type="date"
                   variant="outlined"
@@ -153,6 +202,7 @@ const FbBasicHeaderForm = () => {
                   User type
                 </CustomFormLabel>
                 <CustomSelect
+                  disabled={userState.isAuthLoading}
                   id="user_type_id"
                   value={userType}
                   onChange={onUserTypeChange}
@@ -173,6 +223,7 @@ const FbBasicHeaderForm = () => {
               <Grid container spacing={3} mb={3}>
                 <Grid item xs={12}>
                   <input
+                    disabled={userState.isAuthLoading}
                     accept="image/*"
                     id="user-doc"
                     type="file"

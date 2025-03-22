@@ -14,8 +14,12 @@ import * as dropdownData from "./data";
 import { IconMail } from "@tabler/icons-react";
 import { Stack } from "@mui/system";
 import { logoutFromApp } from "@/services/auth.service";
+import { useSelector } from "@/store/hooks";
+import { AppState } from "@/store/store";
 
 const Profile = () => {
+  const userState = useSelector((state: AppState) => state.userReducer);
+
   const [anchorEl2, setAnchorEl2] = useState(null);
   const handleClick2 = (event: any) => {
     setAnchorEl2(event.currentTarget);
@@ -78,7 +82,7 @@ const Profile = () => {
               color="textPrimary"
               fontWeight={600}
             >
-              Umang Patel
+              {userState.name}
             </Typography>
             <Typography variant="subtitle2" color="textSecondary">
               Rider

@@ -3,16 +3,24 @@
 // Imports
 import Link from "next/link";
 import { useState } from "react";
+import { useDispatch, useSelector } from "@/store/hooks";
+import { IconTrash } from "@tabler/icons-react";
+import LoadingButton from "@mui/lab/LoadingButton";
 import { successfulLogIn } from "@/services/auth.service";
 import { Box, Typography, Button, Stack } from "@mui/material";
 import { loginType } from "@/app/(DashboardLayout)/types/auth/auth";
 import CustomTextField from "@/app/components/forms/theme-elements/CustomTextField";
 import CustomFormLabel from "@/app/components/forms/theme-elements/CustomFormLabel";
+import { nAuth } from "@/constants/network";
+import { post } from "@/services/api.service";
+import { setIsAuthLoading } from "@/store/user/UserReducer";
 
 const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
   // State for form inputs
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const userState = useSelector((state) => state.userReducer);
 
   // State for validation errors
   const [errors, setErrors] = useState<{ email?: string; password?: string }>(
@@ -52,8 +60,21 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
       return;
     }
 
-    successfulLogIn();
+    funLogIn();
   };
+
+  async function funLogIn() {
+    dispatch(setIsAuthLoading(true));
+
+    const response = await post(nAuth.logIn, { email, password });
+    if (response.isError) {
+      dispatch(setIsAuthLoading(false));
+      return {};
+    } else if (response.isEmailVerified) {
+      successfulLogIn(response.id);
+      return {};
+    }
+  }
 
   return (
     <>
@@ -70,6 +91,7 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
           <Box>
             <CustomFormLabel htmlFor="email">Email</CustomFormLabel>
             <CustomTextField
+              disabled={userState.isAuthLoading}
               id="email"
               variant="outlined"
               fullWidth
@@ -82,6 +104,7 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
           <Box>
             <CustomFormLabel htmlFor="password">Password</CustomFormLabel>
             <CustomTextField
+              disabled={userState.isAuthLoading}
               id="password"
               type="password"
               variant="outlined"
@@ -111,16 +134,31 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
             </Typography>
           </Stack>
         </Stack>
+
         <Box>
-          <Button
-            color="primary"
-            variant="contained"
-            size="large"
-            fullWidth
-            type="submit"
-          >
-            Sign In
-          </Button>
+          {!userState.isAuthLoading && (
+            <Button
+              color="primary"
+              variant="contained"
+              size="large"
+              fullWidth
+              type="submit"
+            >
+              Sign In
+            </Button>
+          )}
+
+          {userState.isAuthLoading && (
+            <LoadingButton
+              fullWidth
+              loading
+              variant="contained"
+              color="secondary"
+              endIcon={<IconTrash width={18} />}
+            >
+              Loading
+            </LoadingButton>
+          )}
         </Box>
       </form>
 

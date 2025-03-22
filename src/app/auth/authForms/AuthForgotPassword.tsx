@@ -3,11 +3,20 @@
 // Imports
 import Link from "next/link";
 import { useState } from "react";
+import { nAuth } from "@/constants/network";
 import { Button, Stack } from "@mui/material";
+import { post } from "@/services/api.service";
+import { IconTrash } from "@tabler/icons-react";
+import LoadingButton from "@mui/lab/LoadingButton";
+import { useDispatch, useSelector } from "@/store/hooks";
+import { setIsAuthLoading, setOtpType } from "@/store/user/UserReducer";
 import CustomTextField from "@/app/components/forms/theme-elements/CustomTextField";
 import CustomFormLabel from "@/app/components/forms/theme-elements/CustomFormLabel";
 
 export default function AuthForgotPassword() {
+  const dispatch = useDispatch();
+  const userState = useSelector((state) => state.userReducer);
+
   // State for form inputs
   const [email, setEmail] = useState("");
 
@@ -39,8 +48,23 @@ export default function AuthForgotPassword() {
       return;
     }
 
-    window.location.href = "/otp-verification";
+    funReqOTPForForgetPassword();
   };
+
+  async function funReqOTPForForgetPassword() {
+    dispatch(setIsAuthLoading(true));
+
+    const response = await post(nAuth.forgotPassword, { email });
+    dispatch(setIsAuthLoading(false));
+    if (response.isError) {
+      return {};
+    } else {
+      window.location.href = "/otp-verification";
+      dispatch(setOtpType("Forgot"));
+      localStorage.setItem("otpType", "Forgot");
+      localStorage.setItem("email", email);
+    }
+  }
 
   return (
     <>
@@ -51,6 +75,7 @@ export default function AuthForgotPassword() {
           </CustomFormLabel>
           <CustomTextField
             id="email"
+            disabled={userState.isAuthLoading}
             variant="outlined"
             fullWidth
             value={email}
@@ -59,18 +84,34 @@ export default function AuthForgotPassword() {
             helperText={errors.email}
           />
 
+          {!userState.isAuthLoading && (
+            <Button
+              color="primary"
+              variant="contained"
+              size="large"
+              fullWidth
+              type="submit"
+            >
+              Forgot Password
+            </Button>
+          )}
+
+          {userState.isAuthLoading && (
+            <LoadingButton
+              fullWidth
+              loading
+              variant="contained"
+              color="secondary"
+              endIcon={<IconTrash width={18} />}
+            >
+              Loading
+            </LoadingButton>
+          )}
+
           <Button
             color="primary"
-            variant="contained"
             size="large"
-            fullWidth
-            type="submit"
-          >
-            Forgot Password
-          </Button>
-          <Button
-            color="primary"
-            size="large"
+            disabled={userState.isAuthLoading}
             fullWidth
             component={Link}
             href="/logIn"

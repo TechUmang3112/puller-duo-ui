@@ -1,9 +1,13 @@
 "use client";
 
 // Imports
-import Link from "next/link";
 import { useState } from "react";
-import { successfulLogIn } from "@/services/auth.service";
+import { nAuth } from "@/constants/network";
+import { post } from "@/services/api.service";
+import { IconTrash } from "@tabler/icons-react";
+import LoadingButton from "@mui/lab/LoadingButton";
+import { useDispatch, useSelector } from "@/store/hooks";
+import { setIsAuthLoading, setOtpType } from "@/store/user/UserReducer";
 import { Box, Typography, Button, Stack } from "@mui/material";
 import { loginType } from "@/app/(DashboardLayout)/types/auth/auth";
 import CustomTextField from "@/app/components/forms/theme-elements/CustomTextField";
@@ -14,6 +18,9 @@ const AuthRegister = ({ title, subtitle, subtext }: loginType) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const dispatch = useDispatch();
+  const userState: any = useSelector((state) => state.userReducer);
 
   // State for validation errors
   const [errors, setErrors] = useState<{
@@ -62,8 +69,21 @@ const AuthRegister = ({ title, subtitle, subtext }: loginType) => {
       return;
     }
 
-    window.location.href = "/otp-verification";
+    funSignUp();
   };
+
+  async function funSignUp() {
+    dispatch(setIsAuthLoading(true));
+
+    const response = await post(nAuth.signUp, { email, password });
+    if (!response.isError) {
+      dispatch(setOtpType("Email"));
+      localStorage.setItem("otpType", "Email");
+      window.location.href = "/otp-verification";
+    }
+
+    dispatch(setIsAuthLoading(false));
+  }
 
   return (
     <>
@@ -122,15 +142,29 @@ const AuthRegister = ({ title, subtitle, subtext }: loginType) => {
           ></Stack>
         </Stack>
         <Box>
-          <Button
-            color="primary"
-            variant="contained"
-            size="large"
-            fullWidth
-            type="submit"
-          >
-            Sign In
-          </Button>
+          {!userState.isAuthLoading && (
+            <Button
+              color="primary"
+              variant="contained"
+              size="large"
+              fullWidth
+              type="submit"
+            >
+              Create Account
+            </Button>
+          )}
+
+          {userState.isAuthLoading && (
+            <LoadingButton
+              fullWidth
+              loading
+              variant="contained"
+              color="secondary"
+              endIcon={<IconTrash width={18} />}
+            >
+              Loading
+            </LoadingButton>
+          )}
         </Box>
       </form>
 

@@ -5,7 +5,7 @@ import PageContainer from "@/app/components/container/PageContainer";
 
 export default function TwoSteps2() {
   return (
-    <PageContainer title="Two steps Page" description="this is Sample page">
+    <PageContainer title="Verify OTP" description="Verify OTP">
       <Box
         sx={{
           position: "relative",
@@ -49,14 +49,6 @@ export default function TwoSteps2() {
               >
                 We sent a verification code to your email. Enter the code from
                 the email in the field below.
-              </Typography>
-              <Typography
-                variant="subtitle1"
-                textAlign="center"
-                fontWeight="700"
-                mb={1}
-              >
-                ******@gmail.com
               </Typography>
               <AuthTwoSteps />
             </Card>

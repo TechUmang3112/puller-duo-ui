@@ -4,14 +4,18 @@
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import { styled, useTheme } from "@mui/material/styles";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Header from "./layout/vertical/header/Header";
 import Sidebar from "./layout/vertical/sidebar/Sidebar";
 import Navigation from "./layout/horizontal/navbar/Navigation";
 import HorizontalHeader from "./layout/horizontal/header/Header";
-import { useSelector } from "@/store/hooks";
+import { useDispatch, useSelector } from "@/store/hooks";
 import { AppState } from "@/store/store";
 import { validateAuth } from "@/services/auth.service";
+import { APP_NAME } from "@/constants/strings";
+import { get } from "@/services/api.service";
+import { nUser } from "@/constants/network";
+import { setName } from "@/store/user/UserReducer";
 
 const MainWrapper = styled("div")(() => ({
   display: "flex",
@@ -29,24 +33,31 @@ const PageWrapper = styled("div")(() => ({
   backgroundColor: "transparent",
 }));
 
-interface Props {
-  children: React.ReactNode;
-}
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
-  const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const dispatch = useDispatch();
   const customizer = useSelector((state: AppState) => state.customizer);
   const theme = useTheme();
 
   // Checks for login details
   useEffect(() => {
     validateAuth();
+    getProfile();
   });
+
+  async function getProfile() {
+    const userId = localStorage.getItem("userId");
+    if (!userId) return {};
+
+    const response = await get(nUser.profile, { userId });
+    if (!response.isError) {
+      localStorage.setItem("user_name", response.name ?? "User");
+      dispatch(setName(response.name ?? "User"));
+    }
+  }
 
   return (
     <MainWrapper
@@ -54,7 +65,7 @@ export default function RootLayout({
         customizer.activeMode === "dark" ? "darkbg mainwrapper" : "mainwrapper"
       }
     >
-      <title>Modernize NextJs</title>
+      <title>{APP_NAME}</title>
       {/* ------------------------------------------- */}
       {/* Sidebar */}
       {/* ------------------------------------------- */}

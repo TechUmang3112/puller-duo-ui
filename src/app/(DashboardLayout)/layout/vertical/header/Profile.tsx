@@ -1,5 +1,5 @@
 // Imports
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Box,
@@ -27,6 +27,12 @@ const Profile = () => {
   const handleClose2 = () => {
     setAnchorEl2(null);
   };
+
+  const [userEmail, setUserEmail] = useState<string>("");
+
+  useEffect(() => {
+    setUserEmail(localStorage.getItem("user_email") ?? "");
+  });
 
   return (
     <Box>
@@ -74,18 +80,18 @@ const Profile = () => {
           <Avatar
             src={"/images/profile/user-1.jpg"}
             alt={"ProfileImg"}
-            sx={{ width: 95, height: 95 }}
+            sx={{ width: 60, height: 60 }}
           />
           <Box>
+            <Typography variant="subtitle2" color="textSecondary">
+              Rider
+            </Typography>
             <Typography
               variant="subtitle2"
               color="textPrimary"
               fontWeight={600}
             >
               {userState.name}
-            </Typography>
-            <Typography variant="subtitle2" color="textSecondary">
-              Rider
             </Typography>
             <Typography
               variant="subtitle2"
@@ -94,8 +100,7 @@ const Profile = () => {
               alignItems="center"
               gap={1}
             >
-              <IconMail width={15} height={15} />
-              info@pullerduo.com
+              {userEmail}
             </Typography>
           </Box>
         </Stack>

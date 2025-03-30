@@ -21,7 +21,7 @@ export function successfulLogIn(userId: string) {
 }
 
 export function logoutFromApp() {
+  localStorage.clear();
   localStorage.setItem("isLoggedIn", "false");
-  localStorage.removeItem("userId");
   window.location.replace("/logIn");
 }

@@ -55,6 +55,10 @@ export default function RootLayout({
     const response = await get(nUser.profile, { userId });
     if (!response.isError) {
       localStorage.setItem("user_name", response.name ?? "User");
+      localStorage.setItem(
+        "user_email",
+        response.email ?? "user@pullerduo.com"
+      );
       dispatch(setName(response.name ?? "User"));
     }
   }

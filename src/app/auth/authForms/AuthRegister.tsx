@@ -75,10 +75,11 @@ const AuthRegister = ({ title, subtitle, subtext }: loginType) => {
   async function funSignUp() {
     dispatch(setIsAuthLoading(true));
 
-    const response = await post(nAuth.signUp, { email, password });
+    const response = await post(nAuth.signUp, { email, name, password });
     if (!response.isError) {
       dispatch(setOtpType("Email"));
       localStorage.setItem("otpType", "Email");
+      localStorage.setItem("user_email", email);
       window.location.href = "/otp-verification";
     }
 

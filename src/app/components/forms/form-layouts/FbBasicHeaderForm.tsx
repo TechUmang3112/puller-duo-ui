@@ -2,14 +2,13 @@
 
 // Imports
 import FormData from "form-data";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Box, Button, Grid, MenuItem, IconButton } from "@mui/material";
 import CustomTextField from "../theme-elements/CustomTextField";
 import CustomSelect from "../theme-elements/CustomSelect";
 import CustomFormLabel from "../theme-elements/CustomFormLabel";
 import ParentCard from "../../shared/ParentCard";
 import CloseIcon from "@mui/icons-material/Close";
-import { checkDocumentStatus } from "@/services/user.service";
 import { useDispatch, useSelector } from "@/store/hooks";
 import { setIsAuthLoading, setType } from "@/store/user/UserReducer";
 import { nUser } from "@/constants/network";
@@ -105,6 +104,10 @@ const FbBasicHeaderForm = () => {
     window.location.replace("/user/verification-pending");
   }
 
+  useEffect(() => {
+    setName(localStorage.getItem("user_name") ?? "");
+  });
+
   return (
     <div>
       {/* ------------------------------------------------------------------------------------------------ */}
@@ -158,6 +161,7 @@ const FbBasicHeaderForm = () => {
                   Full Name
                 </CustomFormLabel>
                 <CustomTextField
+                  value={name}
                   disabled={userState.isAuthLoading}
                   onChange={(e: any) => {
                     setName(e.target.value);

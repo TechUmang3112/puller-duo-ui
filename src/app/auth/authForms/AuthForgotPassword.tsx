@@ -62,7 +62,7 @@ export default function AuthForgotPassword() {
       window.location.href = "/otp-verification";
       dispatch(setOtpType("Forgot"));
       localStorage.setItem("otpType", "Forgot");
-      localStorage.setItem("email", email);
+      localStorage.setItem("user_email", email);
     }
   }
 

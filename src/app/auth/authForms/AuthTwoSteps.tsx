@@ -6,14 +6,14 @@ import { useEffect, useState } from "react";
 import { Stack } from "@mui/system";
 import { Box, Typography, Button } from "@mui/material";
 import { useDispatch, useSelector } from "@/store/hooks";
-import CustomTextField from "@/app/components/forms/theme-elements/CustomTextField";
-import CustomFormLabel from "@/app/components/forms/theme-elements/CustomFormLabel";
 import { post } from "@/services/api.service";
 import { nAuth } from "@/constants/network";
 import { setIsAuthLoading } from "@/store/user/UserReducer";
 import { successfulLogIn } from "@/services/auth.service";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { IconTrash } from "@tabler/icons-react";
+import CustomTextField from "@/app/components/forms/theme-elements/CustomTextField";
+import CustomFormLabel from "@/app/components/forms/theme-elements/CustomFormLabel";
 
 const AuthTwoSteps = () => {
   const dispatch = useDispatch();
@@ -73,7 +73,7 @@ const AuthTwoSteps = () => {
 
     const localOtpType = localStorage.getItem("otpType") ?? "Email";
     const body: any = {
-      email: localStorage.getItem("email"),
+      email: localStorage.getItem("user_email"),
       otp: otp.join(""),
     };
     if (localOtpType == "Forgot") {

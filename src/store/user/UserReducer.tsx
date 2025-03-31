@@ -5,6 +5,7 @@ export type UserState = {
   name: string;
   email?: string;
   isAuthLoading: boolean;
+  isDocVerificationPending: boolean;
   otpType: "Email" | "Forgot";
   type: "Admin" | "Not decided" | "Driver" | "Rider";
 };
@@ -15,6 +16,7 @@ const initialState = {
   isAuthLoading: false,
   otpType: "Email",
   type: "Not decided",
+  isDocVerificationPending: false,
 } as UserState;
 
 export const userReducer = createSlice({
@@ -33,6 +35,9 @@ export const userReducer = createSlice({
     setOtpType: (state, action) => {
       state.otpType = action.payload;
     },
+    setIsDocVerificationPending: (state, action) => {
+      state.isDocVerificationPending = action.payload;
+    },
     logOut: () => initialState,
     setType: (state, action) => {
       state.type = action.payload;
@@ -40,7 +45,13 @@ export const userReducer = createSlice({
   },
 });
 
-export const { setName, setEmail, setIsAuthLoading, setOtpType, setType } =
-  userReducer.actions;
+export const {
+  setName,
+  setEmail,
+  setIsAuthLoading,
+  setOtpType,
+  setType,
+  setIsDocVerificationPending,
+} = userReducer.actions;
 
 export default userReducer.reducer;

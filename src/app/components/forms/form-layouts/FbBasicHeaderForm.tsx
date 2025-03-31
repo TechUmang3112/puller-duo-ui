@@ -43,24 +43,53 @@ const FbBasicHeaderForm = () => {
   const userState = useSelector((state) => state.userReducer);
 
   const [name, setName] = useState("");
+  const [nameError, setNameError] = useState("");
 
   const [currency, setCurrency] = useState("");
+  const [currencyError, setCurrencyError] = useState("");
   const handleChange2 = (event: any) => {
     setCurrency(event.target.value);
+    setCurrencyError("");
   };
 
   const [userType, setUserType] = useState("");
+  const [userTypeError, setUserTypeError] = useState("");
   const onUserTypeChange = (event: any) => {
     setUserType(event.target.value);
+    setUserTypeError("");
     dispatch(setType(event.target.value));
   };
+
+  const [dob, setDob] = useState("");
+  const [dobError, setDobError] = useState("");
 
   // State for image upload
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageError, setImageError] = useState("");
 
   // Ref for file input
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Get today's date in YYYY-MM-DD format for date input max value
+  const today = new Date().toISOString().split("T")[0];
+
+  // Calculate age from date of birth
+  const calculateAge = (birthDate: string) => {
+    const birthDateObj = new Date(birthDate);
+    const todayObj = new Date();
+    let age = todayObj.getFullYear() - birthDateObj.getFullYear();
+    const monthDiff = todayObj.getMonth() - birthDateObj.getMonth();
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && todayObj.getDate() < birthDateObj.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
+  };
 
   // Handle image selection
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,6 +97,7 @@ const FbBasicHeaderForm = () => {
     if (file && file.type.startsWith("image/")) {
       setSelectedImage(file);
       setImagePreview(URL.createObjectURL(file));
+      setImageError("");
     } else {
       alert("Please upload a valid image file.");
     }
@@ -82,9 +112,70 @@ const FbBasicHeaderForm = () => {
   const handleRemoveImage = () => {
     setSelectedImage(null);
     setImagePreview(null);
+    setImageError("Please upload an image");
+  };
+
+  const validateForm = () => {
+    let isValid = true;
+
+    if (!name.trim()) {
+      setNameError("Name is required");
+      isValid = false;
+    }
+
+    if (!currency) {
+      setCurrencyError("Gender is required");
+      isValid = false;
+    }
+
+    if (!userType) {
+      setUserTypeError("User type is required");
+      isValid = false;
+    }
+
+    if (!dob) {
+      setDobError("Date of birth is required");
+      isValid = false;
+    } else {
+      // Check if date is in the future
+      const selectedDate = new Date(dob);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time part for accurate comparison
+
+      if (selectedDate > today) {
+        setDobError("Date of birth cannot be in the future");
+        isValid = false;
+      } else {
+        // Check age requirements based on user type
+        const age = calculateAge(dob);
+
+        if (userType === "Driver" && age < 18) {
+          setDobError("Driver must be at least 18 years old");
+          isValid = false;
+        } else if (userType === "Rider" && age < 12) {
+          setDobError("Rider must be at least 12 years old");
+          isValid = false;
+        }
+      }
+    }
+
+    if (!selectedImage) {
+      setImageError(
+        userType === "Driver"
+          ? "Driver license is required"
+          : "Aadhaar card is required"
+      );
+      isValid = false;
+    }
+
+    return isValid;
   };
 
   async function updateProfile() {
+    if (!validateForm()) {
+      return;
+    }
+
     dispatch(setIsAuthLoading(true));
 
     const body = new FormData();
@@ -92,27 +183,32 @@ const FbBasicHeaderForm = () => {
     body.append("name", name);
     body.append("type", userType == "Driver" ? "1" : "0");
     body.append("gender", currency == "Male" ? "0" : "1");
-    body.append("file", selectedImage);
+    body.append("dob", dob);
+    if (selectedImage) {
+      body.append("file", selectedImage);
+    }
 
-    const response = await post(nUser.updateProfile, body, {
-      "Content-Type": "multipart/form-data",
-    });
-    dispatch(setIsAuthLoading(false));
+    try {
+      const response = await post(nUser.updateProfile, body, {
+        "Content-Type": "multipart/form-data",
+      });
+      dispatch(setIsAuthLoading(false));
 
-    localStorage.setItem("isProfileUpdated", "true");
-    localStorage.setItem("isDocUnderVerification", "true");
-    window.location.replace("/user/verification-pending");
+      localStorage.setItem("isProfileUpdated", "true");
+      localStorage.setItem("isDocUnderVerification", "true");
+      window.location.replace("/user/verification-pending");
+    } catch (error) {
+      dispatch(setIsAuthLoading(false));
+      // Handle API error here
+    }
   }
 
   useEffect(() => {
     setName(localStorage.getItem("user_name") ?? "");
-  });
+  }, []);
 
   return (
     <div>
-      {/* ------------------------------------------------------------------------------------------------ */}
-      {/* Basic Checkbox */}
-      {/* ------------------------------------------------------------------------------------------------ */}
       <ParentCard
         title="Update your profile"
         footer={
@@ -132,9 +228,7 @@ const FbBasicHeaderForm = () => {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => {
-                  updateProfile();
-                }}
+                onClick={updateProfile}
               >
                 Submit
               </Button>
@@ -154,7 +248,12 @@ const FbBasicHeaderForm = () => {
         }
       >
         <>
-          <form>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              updateProfile();
+            }}
+          >
             <Grid container spacing={3} mb={3}>
               <Grid item lg={6} md={12} sm={12}>
                 <CustomFormLabel htmlFor="fname-text">
@@ -165,10 +264,13 @@ const FbBasicHeaderForm = () => {
                   disabled={userState.isAuthLoading}
                   onChange={(e: any) => {
                     setName(e.target.value);
+                    setNameError("");
                   }}
                   id="fname-text"
                   variant="outlined"
                   fullWidth
+                  error={!!nameError}
+                  helperText={nameError}
                 />
                 <CustomFormLabel htmlFor="standard-select-currency">
                   Select Gender
@@ -180,25 +282,43 @@ const FbBasicHeaderForm = () => {
                   onChange={handleChange2}
                   fullWidth
                   variant="outlined"
+                  error={!!currencyError}
                 >
+                  <MenuItem value="">
+                    <em>Select Gender</em>
+                  </MenuItem>
                   {currencies.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.label}
                     </MenuItem>
                   ))}
                 </CustomSelect>
+                {currencyError && (
+                  <Box color="error.main" fontSize="0.75rem" mt={0.5} ml={2}>
+                    {currencyError}
+                  </Box>
+                )}
               </Grid>
               <Grid item lg={6} md={12} sm={12}>
                 <CustomFormLabel htmlFor="date">Date of Birth</CustomFormLabel>
-
                 <CustomTextField
                   disabled={userState.isAuthLoading}
                   id="date"
                   type="date"
                   variant="outlined"
                   fullWidth
+                  value={dob}
+                  onChange={(e: any) => {
+                    setDob(e.target.value);
+                    setDobError("");
+                  }}
+                  error={!!dobError}
+                  helperText={dobError}
                   InputLabelProps={{
                     shrink: true,
+                  }}
+                  inputProps={{
+                    max: today, // Prevent selecting future dates
                   }}
                 />
 
@@ -212,13 +332,22 @@ const FbBasicHeaderForm = () => {
                   onChange={onUserTypeChange}
                   fullWidth
                   variant="outlined"
+                  error={!!userTypeError}
                 >
+                  <MenuItem value="">
+                    <em>Select User Type</em>
+                  </MenuItem>
                   {user_type.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.label}
                     </MenuItem>
                   ))}
                 </CustomSelect>
+                {userTypeError && (
+                  <Box color="error.main" fontSize="0.75rem" mt={0.5} ml={2}>
+                    {userTypeError}
+                  </Box>
+                )}
               </Grid>
             </Grid>
 
@@ -249,6 +378,11 @@ const FbBasicHeaderForm = () => {
                       </Button>
                     )}
                   </label>
+                  {imageError && (
+                    <Box color="error.main" fontSize="0.75rem" mt={0.5} ml={2}>
+                      {imageError}
+                    </Box>
+                  )}
                   {imagePreview && (
                     <Box mt={2} position="relative" display="inline-block">
                       <img

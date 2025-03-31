@@ -84,7 +84,7 @@ const Profile = () => {
           />
           <Box>
             <Typography variant="subtitle2" color="textSecondary">
-              Rider
+              {userState.type}
             </Typography>
             <Typography
               variant="subtitle2"

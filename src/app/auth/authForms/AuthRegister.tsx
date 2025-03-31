@@ -80,6 +80,7 @@ const AuthRegister = ({ title, subtitle, subtext }: loginType) => {
       dispatch(setOtpType("Email"));
       localStorage.setItem("otpType", "Email");
       localStorage.setItem("user_email", email);
+      localStorage.setItem("user_name", name);
       window.location.href = "/otp-verification";
     }
 

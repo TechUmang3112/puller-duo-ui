@@ -38,7 +38,7 @@ export const Profile = () => {
 
           <Box>
             <Typography variant="h6">{userState.name.split(" ")[0]}</Typography>
-            <Typography variant="caption">Rider</Typography>
+            <Typography variant="caption">{userState.type}</Typography>
           </Box>
           <Box sx={{ ml: "auto" }}>
             <Tooltip title="Logout" placement="top">

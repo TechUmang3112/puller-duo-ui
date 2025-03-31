@@ -15,7 +15,11 @@ import { validateAuth } from "@/services/auth.service";
 import { APP_NAME } from "@/constants/strings";
 import { get } from "@/services/api.service";
 import { nUser } from "@/constants/network";
-import { setName } from "@/store/user/UserReducer";
+import {
+  setIsDocVerificationPending,
+  setName,
+  setType,
+} from "@/store/user/UserReducer";
 
 const MainWrapper = styled("div")(() => ({
   display: "flex",
@@ -59,7 +63,19 @@ export default function RootLayout({
         "user_email",
         response.email ?? "user@pullerduo.com"
       );
+      localStorage.setItem("user_type", response.type ?? "-1");
       dispatch(setName(response.name ?? "User"));
+
+      // Set the user type
+      const user_type = response.type ?? -1;
+      let actual_user_type = "User";
+      if (user_type == "0") actual_user_type = "Rider";
+      else if (user_type == "1") actual_user_type = "Driver";
+      else if (user_type == "2") actual_user_type = "Admin";
+      dispatch(setType(actual_user_type));
+
+      // Set document under verification
+      dispatch(setIsDocVerificationPending(response.isDocVerificationPending));
     }
   }
 

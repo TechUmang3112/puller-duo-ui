@@ -10,7 +10,7 @@ import CustomFormLabel from "../theme-elements/CustomFormLabel";
 import ParentCard from "../../shared/ParentCard";
 import CloseIcon from "@mui/icons-material/Close";
 import { useDispatch, useSelector } from "@/store/hooks";
-import { setIsAuthLoading, setType } from "@/store/user/UserReducer";
+import { setGender, setIsAuthLoading, setType } from "@/store/user/UserReducer";
 import { nUser } from "@/constants/network";
 import { post } from "@/services/api.service";
 import { IconTrash } from "@tabler/icons-react";
@@ -59,6 +59,16 @@ const FbBasicHeaderForm = () => {
     setUserTypeError("");
     dispatch(setType(event.target.value));
   };
+
+  useEffect(() => {
+    if (["Driver", "Rider"].includes(userState.type)) {
+      setUserType(userState.type);
+    }
+
+    if (userState.gender) {
+      setCurrency(userState.gender);
+    }
+  }, []);
 
   const [dob, setDob] = useState("");
   const [dobError, setDobError] = useState("");
@@ -177,6 +187,7 @@ const FbBasicHeaderForm = () => {
     }
 
     dispatch(setIsAuthLoading(true));
+    dispatch(setGender(currency));
 
     const body = new FormData();
     body.append("userId", localStorage.getItem("userId"));
@@ -189,7 +200,7 @@ const FbBasicHeaderForm = () => {
     }
 
     try {
-      const response = await post(nUser.updateProfile, body, {
+      await post(nUser.updateProfile, body, {
         "Content-Type": "multipart/form-data",
       });
       dispatch(setIsAuthLoading(false));
@@ -205,6 +216,10 @@ const FbBasicHeaderForm = () => {
 
   useEffect(() => {
     setName(localStorage.getItem("user_name") ?? "");
+
+    if (userState.dob) {
+      setDob(userState.dob);
+    }
   }, []);
 
   return (
@@ -326,7 +341,10 @@ const FbBasicHeaderForm = () => {
                   User type
                 </CustomFormLabel>
                 <CustomSelect
-                  disabled={userState.isAuthLoading}
+                  disabled={
+                    userState.isAuthLoading ||
+                    ["Driver", "Rider"].includes(userState.type)
+                  }
                   id="user_type_id"
                   value={userType}
                   onChange={onUserTypeChange}

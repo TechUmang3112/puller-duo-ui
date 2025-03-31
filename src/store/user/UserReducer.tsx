@@ -2,7 +2,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 export type UserState = {
+  gender?: string;
   name: string;
+  dob?: string;
   email?: string;
   isAuthLoading: boolean;
   isDocVerificationPending: boolean;
@@ -11,7 +13,9 @@ export type UserState = {
 };
 
 const initialState = {
+  gender: undefined,
   name: "User",
+  dob: undefined,
   email: undefined,
   isAuthLoading: false,
   otpType: "Email",
@@ -28,6 +32,12 @@ export const userReducer = createSlice({
     },
     setEmail: (state, action) => {
       state.email = action.payload;
+    },
+    setDob: (state, action) => {
+      state.dob = action.payload;
+    },
+    setGender: (state, action) => {
+      state.gender = action.payload;
     },
     setIsAuthLoading: (state, action) => {
       state.isAuthLoading = action.payload;
@@ -51,7 +61,9 @@ export const {
   setIsAuthLoading,
   setOtpType,
   setType,
+  setDob,
   setIsDocVerificationPending,
+  setGender,
 } = userReducer.actions;
 
 export default userReducer.reducer;

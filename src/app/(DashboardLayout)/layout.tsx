@@ -16,6 +16,8 @@ import { APP_NAME } from "@/constants/strings";
 import { get } from "@/services/api.service";
 import { nUser } from "@/constants/network";
 import {
+  setDob,
+  setGender,
   setIsDocVerificationPending,
   setName,
   setType,
@@ -76,6 +78,15 @@ export default function RootLayout({
 
       // Set document under verification
       dispatch(setIsDocVerificationPending(response.isDocVerificationPending));
+
+      // Set DOB
+      dispatch(setDob(response.dob));
+
+      if (response.gender == "0") {
+        dispatch(setGender("Male"));
+      } else if (response.gender == "1") {
+        dispatch(setGender("Female"));
+      }
     }
   }
 

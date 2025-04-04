@@ -2,15 +2,15 @@ import React from "react";
 import Link from "next/link";
 
 // mui imports
-import Chip from '@mui/material/Chip';
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import { Theme } from '@mui/material/styles';
-import Typography from '@mui/material/Typography';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { styled, useTheme } from '@mui/material/styles';
+import Chip from "@mui/material/Chip";
+import List from "@mui/material/List";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import { Theme } from "@mui/material/styles";
+import Typography from "@mui/material/Typography";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { styled, useTheme } from "@mui/material/styles";
 import { useSelector } from "@/store/hooks";
 import { useTranslation } from "react-i18next";
 import { AppState } from "@/store/store";
@@ -98,7 +98,7 @@ export default function NavItem({
 
   return (
     <List component="li" disablePadding key={item?.id && item.title}>
-      <Link href={item.href}>
+      <Link onClick={() => (window.location.href = item.href)} href={item.href}>
         <ListItemStyled
           disabled={item?.disabled}
           selected={pathDirect === item?.href}

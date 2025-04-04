@@ -7,7 +7,7 @@ import NotificationTable from "@/app/components/user/NotificationTable";
 
 const Notifications = () => {
   return (
-    <PageContainer title="My Rides" description="My Rides">
+    <PageContainer title="My Notifications" description="My Notifications">
       <NotificationTable />
     </PageContainer>
   );

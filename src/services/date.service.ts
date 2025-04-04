@@ -23,3 +23,56 @@ export function jsonDateToReadbaleFormat(jsonDate: string) {
 
   return `${formattedDate} ${formattedTime}`;
 }
+
+export function getFormattedDateAndTime(date: Date) {
+  // Format date as "14th Apr"
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const dayNum = date.getDate();
+  const monthName = monthNames[date.getMonth()];
+  const dateStr = `${dayNum}${getOrdinalSuffix(dayNum)} ${monthName}`;
+
+  // Format time as "04:28PM" with leading zero
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+  const ampm = hours >= 12 ? "PM" : "AM";
+
+  hours = hours % 12;
+  hours = hours || 12; // Convert 0 to 12
+
+  const formattedHours = hours.toString().padStart(2, "0");
+  const formattedMinutes = minutes.toString().padStart(2, "0");
+
+  const timeStr = `${formattedHours}:${formattedMinutes}${ampm}`;
+
+  return {
+    Date: dateStr,
+    Time: timeStr,
+  };
+}
+
+function getOrdinalSuffix(day: number): string {
+  if (day > 3 && day < 21) return "th";
+  switch (day % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+}

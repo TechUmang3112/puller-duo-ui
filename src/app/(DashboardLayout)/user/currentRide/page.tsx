@@ -9,10 +9,7 @@ import InvoiceDetail from "@/app/components/apps/invoice/Invoice-detail/index";
 const CurrentRide = () => {
   return (
     <InvoiceProvider>
-      <PageContainer
-        title="Invoice Detail"
-        description="this is Invoice Detail"
-      >
+      <PageContainer title="Current Ride" description="Current Ride">
         <BlankCard>
           <CardContent>
             <InvoiceDetail />

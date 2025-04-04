@@ -23,10 +23,13 @@ import {
 import { format, isValid, parseISO } from "date-fns";
 import Link from "next/link";
 import Logo from "@/app/(DashboardLayout)/layout/shared/logo/Logo";
+import { useSelector } from "@/store/hooks";
+import { AppState } from "@/store/store";
 
 const InvoiceDetail = () => {
   const { invoices } = useContext(InvoiceContext);
   const [selectedInvoice, setSelectedInvoice]: any = useState(null);
+  const userState = useSelector((state: AppState) => state.userReducer);
 
   useEffect(() => {
     // Set the first invoice as the default selected invoice initially
@@ -205,30 +208,32 @@ const InvoiceDetail = () => {
           </Typography>
         </Box>
       </Box>
-      <Box
-        display="flex"
-        alignItems="center"
-        gap={1}
-        mt={3}
-        justifyContent="end"
-      >
-        <Button
-          variant="contained"
-          color="secondary"
-          component={Link}
-          href={`/apps/invoice/edit/${selectedInvoice.billFrom}`}
+      {userState.type == "Rider" && (
+        <Box
+          display="flex"
+          alignItems="center"
+          gap={1}
+          mt={3}
+          justifyContent="end"
         >
-          Cancel payment
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          component={Link}
-          href="/apps/invoice/list"
-        >
-          Pay now
-        </Button>
-      </Box>
+          <Button
+            variant="contained"
+            color="secondary"
+            component={Link}
+            href={`/apps/invoice/edit/${selectedInvoice.billFrom}`}
+          >
+            Cancel payment
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            component={Link}
+            href="/apps/invoice/list"
+          >
+            Pay now
+          </Button>
+        </Box>
+      )}
     </>
   );
 };

@@ -43,21 +43,48 @@ import {
 import Disabled from "../ui-components/rating/Disabled";
 
 export interface PaginationDataType {
-  Date: string;
-  Time: string;
-  Content: string;
+  Date?: string;
+  Time?: string;
+  "Starting point": string;
+  "Ending point": string;
+  "Ride cost": number;
 }
 
 export const basicsTableData: PaginationDataType[] = [
   {
     Date: getFormattedDateAndTime(new Date()).Date,
     Time: getFormattedDateAndTime(new Date()).Time,
-    Content: "Your email has been verified !",
+    "Starting point": "Sanand",
+    "Ending point": "Thaltej - Metro station",
+    "Ride cost": 500,
   },
   {
     Date: getFormattedDateAndTime(new Date()).Date,
     Time: getFormattedDateAndTime(new Date()).Time,
-    Content: "Your aadhaar card  has been verified !",
+    "Starting point": "Thaltej - Metro station",
+    "Ending point": "Vastral - Metro station",
+    "Ride cost": 900,
+  },
+  {
+    Date: getFormattedDateAndTime(new Date()).Date,
+    Time: getFormattedDateAndTime(new Date()).Time,
+    "Starting point": "Thaltej - Metro station",
+    "Ending point": "Gota",
+    "Ride cost": 900,
+  },
+  {
+    Date: getFormattedDateAndTime(new Date()).Date,
+    Time: getFormattedDateAndTime(new Date()).Time,
+    "Starting point": "Thaltej - Metro station",
+    "Ending point": "Vastral - Metro station",
+    "Ride cost": 900,
+  },
+  {
+    Date: getFormattedDateAndTime(new Date()).Date,
+    Time: getFormattedDateAndTime(new Date()).Time,
+    "Starting point": "Thaltej - Metro station",
+    "Ending point": "Gota",
+    "Ride cost": 900,
   },
 ];
 
@@ -69,6 +96,8 @@ const columns = [
   columnHelper.accessor("Date", {
     header: () => "Date",
     cell: (info: any) => {
+      console.log("info", info);
+
       return (
         <Stack direction="row" alignItems="center" spacing={2}>
           <Box>
@@ -88,17 +117,35 @@ const columns = [
     ),
   }),
 
-  columnHelper.accessor("Content", {
-    header: () => "Content",
+  columnHelper.accessor("Starting point", {
+    header: () => "Starting point",
     cell: (info) => (
       <Typography variant="subtitle1" color="textSecondary">
         {info.getValue()}
       </Typography>
     ),
   }),
+
+  columnHelper.accessor("Ending point", {
+    header: () => "Ending point",
+    cell: (info) => (
+      <Typography variant="subtitle1" color="textSecondary">
+        {info.getValue()}
+      </Typography>
+    ),
+  }),
+
+  columnHelper.accessor("Ride cost", {
+    header: () => "Ride cost",
+    cell: (info) => (
+      <Typography variant="subtitle1" color="textSecondary">
+        Rs. {info.getValue()}
+      </Typography>
+    ),
+  }),
 ];
 
-const NotificationTable = () => {
+const UpcomingTable = () => {
   const [data, _setData] = React.useState(() => [...basics]);
   const [columnFilters, setColumnFilters] = React.useState<any>([]);
   const table = useReactTable({
@@ -118,12 +165,8 @@ const NotificationTable = () => {
     debugColumns: false,
   });
 
-  useEffect(() => {
-    table.setPageSize(5);
-  });
-
   return (
-    <DownloadCard title="Notifications">
+    <DownloadCard title="My Upcoming Rides">
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Box>
@@ -192,7 +235,7 @@ const NotificationTable = () => {
             >
               <Box display="flex" alignItems="center" gap={1}>
                 <Typography variant="body1">
-                  {table.getPrePaginationRowModel().rows.length} Notifications
+                  {table.getPrePaginationRowModel().rows.length} Rides
                 </Typography>
               </Box>
               <Box
@@ -277,4 +320,4 @@ const NotificationTable = () => {
   );
 };
 
-export default NotificationTable;
+export default UpcomingTable;

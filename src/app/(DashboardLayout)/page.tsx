@@ -48,9 +48,11 @@ export default function Dashboard() {
             <OfferRideForm />
           </Grid>
 
-          <Grid item xs={6} md={12}>
-            <RideResults />
-          </Grid>
+          {userState.type == "Rider" && (
+            <Grid item xs={6} md={12}>
+              <RideResults />
+            </Grid>
+          )}
         </Grid>
       </Box>
     </PageContainer>

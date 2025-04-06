@@ -36,6 +36,14 @@ const user_type = [
     value: "Rider",
     label: "Rider",
   },
+  ...(localStorage.getItem("user_type") == "2"
+    ? [
+        {
+          value: "Admin",
+          label: "Admin",
+        },
+      ]
+    : []),
 ];
 
 const FbBasicHeaderForm = () => {

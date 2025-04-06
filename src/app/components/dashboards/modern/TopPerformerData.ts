@@ -6,6 +6,9 @@ interface PerformerType {
   pname: string;
   status: string;
   budget: string;
+  rides?: number;
+  rating?: number;
+  earning?: number;
 }
 
 const TopPerformerData: PerformerType[] = [
@@ -17,6 +20,9 @@ const TopPerformerData: PerformerType[] = [
     pname: "Elite Admin",
     status: "Low",
     budget: "3.9",
+    rides: 235,
+    rating: 4,
+    earning: 45677,
   },
   {
     id: "2",
@@ -26,6 +32,9 @@ const TopPerformerData: PerformerType[] = [
     pname: "Flexy Admin",
     status: "Medium",
     budget: "24.5",
+    rides: 235,
+    rating: 4,
+    earning: 45677,
   },
   {
     id: "3",
@@ -35,6 +44,9 @@ const TopPerformerData: PerformerType[] = [
     pname: "Material Pro",
     status: "High",
     budget: "12.8",
+    rides: 235,
+    rating: 4,
+    earning: 45677,
   },
   {
     id: "4",
@@ -44,6 +56,9 @@ const TopPerformerData: PerformerType[] = [
     pname: "Xtreme Admin",
     status: "Very High",
     budget: "2.4",
+    rides: 235,
+    rating: 4,
+    earning: 45677,
   },
 ];
 

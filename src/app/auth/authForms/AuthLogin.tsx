@@ -71,6 +71,7 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
       dispatch(setIsAuthLoading(false));
       return {};
     } else if (response.isEmailVerified) {
+      localStorage.setItem("user_type", response.type);
       successfulLogIn(response.id);
       return {};
     }

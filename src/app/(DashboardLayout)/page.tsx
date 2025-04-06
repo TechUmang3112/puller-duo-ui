@@ -11,6 +11,16 @@ import RideResults from "../components/ride-results/RideResults";
 import RideInsights from "../components/ride-results/RideInsights";
 import PageContainer from "@/app/components/container/PageContainer";
 import OfferRideForm from "../components/offer-ride-form/OfferRideForm";
+import RevenueUpdates from "../components/dashboards/modern/RevenueUpdates";
+import YearlyBreakup from "../components/dashboards/modern/YearlyBreakup";
+import MonthlyEarnings from "../components/dashboards/modern/MonthlyEarnings";
+import EmployeeSalary from "../components/dashboards/modern/EmployeeSalary";
+import Customers from "../components/dashboards/modern/Customers";
+import SellingProducts from "../components/dashboards/modern/SellingProducts";
+import TopPerformers from "../components/dashboards/modern/TopPerformers";
+import WeeklyStats from "../components/dashboards/modern/WeeklyStats";
+import Social from "../components/dashboards/modern/Social";
+import Projects from "../components/dashboards/modern/Projects";
 
 const BCrumb = [
   {
@@ -43,17 +53,48 @@ export default function Dashboard() {
         )}
 
         <RideInsights />
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={12}>
-            <OfferRideForm />
-          </Grid>
-
-          {userState.type == "Rider" && (
-            <Grid item xs={6} md={12}>
-              <RideResults />
+        {userState.type != "Admin" && (
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={12}>
+              <OfferRideForm />
             </Grid>
-          )}
-        </Grid>
+
+            {userState.type == "Rider" && (
+              <Grid item xs={6} md={12}>
+                <RideResults />
+              </Grid>
+            )}
+          </Grid>
+        )}
+
+        {userState.type == "Admin" && (
+          <Grid container spacing={3}>
+            {/* column */}
+            <Grid item xs={12} lg={8}>
+              <RevenueUpdates isLoading={isLoading} />
+            </Grid>
+            {/* column */}
+            <Grid item xs={12} lg={4}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6} lg={12}>
+                  <YearlyBreakup isLoading={isLoading} />
+                </Grid>
+                <Grid item xs={12} sm={6} lg={12}>
+                  <MonthlyEarnings isLoading={isLoading} />
+                </Grid>
+              </Grid>
+            </Grid>
+
+            {/* column */}
+            <Grid item xs={12} lg={4}>
+              <EmployeeSalary isLoading={isLoading} />
+            </Grid>
+            {/* column */}
+            <Grid item xs={12} lg={8}>
+              <TopPerformers />
+            </Grid>
+          </Grid>
+        )}
       </Box>
     </PageContainer>
   );

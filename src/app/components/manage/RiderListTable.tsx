@@ -42,23 +42,23 @@ export interface PaginationDataType {
   Name: string;
   Email: string;
   "Total Rides": number;
-  Rating: number;
+  Spendings: number;
   DocumentStatus: string;
 }
 
 export const basicsTableData: PaginationDataType[] = [
   {
     Name: "Rahil Patel",
-    Email: "rahil.driver@gmail.com",
+    Email: "rahil.rider@gmail.com",
     "Total Rides": 12,
-    Rating: 4,
+    Spendings: 4000,
     DocumentStatus: "Approved",
   },
   {
     Name: "Dhruv Patel",
-    Email: "dhruv.driver@gmail.com",
+    Email: "dhruv.rider@gmail.com",
     "Total Rides": 0,
-    Rating: 0,
+    Spendings: 0,
     DocumentStatus: "Rejected",
   },
 ];
@@ -95,17 +95,13 @@ const columns = [
     ),
   }),
 
-  columnHelper.accessor("Rating", {
-    header: () => "Rating",
-    cell: (info) => {
-      if (info.getValue()) {
-        return (
-          <Grid item xs={12} lg={4} sm={6} display="flex" alignItems="stretch">
-            <Disabled />
-          </Grid>
-        );
-      } else return <></>;
-    },
+  columnHelper.accessor("Spendings", {
+    header: () => "Spendings",
+    cell: (info) => (
+      <Typography variant="subtitle1" color="textSecondary">
+        ₹{info.getValue()}
+      </Typography>
+    ),
   }),
 
   columnHelper.accessor("DocumentStatus", {
@@ -144,7 +140,7 @@ const columns = [
   }),
 ];
 
-const DriverListTable = () => {
+const RiderListTable = () => {
   const [data, _setData] = React.useState(() => [...basics]);
   const [columnFilters, setColumnFilters] = React.useState<any>([]);
   const table = useReactTable({
@@ -169,7 +165,7 @@ const DriverListTable = () => {
   });
 
   return (
-    <DownloadCard title="Drivers">
+    <DownloadCard title="Riders">
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Box>
@@ -238,7 +234,7 @@ const DriverListTable = () => {
             >
               <Box display="flex" alignItems="center" gap={1}>
                 <Typography variant="body1">
-                  {table.getPrePaginationRowModel().rows.length} Drivers
+                  {table.getPrePaginationRowModel().rows.length} Riders
                 </Typography>
               </Box>
               <Box
@@ -323,4 +319,4 @@ const DriverListTable = () => {
   );
 };
 
-export default DriverListTable;
+export default RiderListTable;

@@ -126,7 +126,7 @@ const Menuitems: MenuitemsType[] = [
           id: uniqueId(),
           title: "Riders",
           icon: IconUser,
-          href: "/user/currentRide",
+          href: "/manage/riders",
           chipColor: "secondary",
         },
         {

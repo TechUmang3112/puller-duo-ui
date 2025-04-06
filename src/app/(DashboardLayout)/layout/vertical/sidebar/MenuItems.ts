@@ -133,7 +133,7 @@ const Menuitems: MenuitemsType[] = [
           id: uniqueId(),
           title: "Total Rides",
           icon: IconMapPin,
-          href: "/user/upcomingRides",
+          href: "/manage/totalRides",
           chipColor: "secondary",
         },
       ]

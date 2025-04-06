@@ -119,7 +119,7 @@ const Menuitems: MenuitemsType[] = [
           id: uniqueId(),
           title: "Drivers",
           icon: IconBus,
-          href: "/user/myRides",
+          href: "/manage/drivers",
           chipColor: "secondary",
         },
         {

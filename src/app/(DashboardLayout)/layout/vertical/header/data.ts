@@ -65,18 +65,22 @@ const profile: ProfileType[] = [
     subtitle: "Account Settings",
     icon: "/images/svgs/icon-account.svg",
   },
-  {
-    href: "/user/notifications",
-    title: "My Notifications",
-    subtitle: "Messages & Emails",
-    icon: "/images/svgs/icon-inbox.svg",
-  },
-  {
-    href: "/user/myRides",
-    title: "My Rides",
-    subtitle: "History & Upcoming Rides",
-    icon: "/images/svgs/icon-tasks.svg",
-  },
+  ...(localStorage.getItem("user_type") != "2"
+    ? [
+        {
+          href: "/user/notifications",
+          title: "My Notifications",
+          subtitle: "Messages & Emails",
+          icon: "/images/svgs/icon-inbox.svg",
+        },
+        {
+          href: "/user/myRides",
+          title: "My Rides",
+          subtitle: "History & Upcoming Rides",
+          icon: "/images/svgs/icon-tasks.svg",
+        },
+      ]
+    : []),
 ];
 
 // apps dropdown

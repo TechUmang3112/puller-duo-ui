@@ -1,6 +1,6 @@
 {
-  "name": "modernize-next-main",
-  "version": "5.0.0",
+  "name": "puller-duo-ui",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",

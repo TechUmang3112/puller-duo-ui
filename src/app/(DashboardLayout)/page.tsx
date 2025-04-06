@@ -15,12 +15,7 @@ import RevenueUpdates from "../components/dashboards/modern/RevenueUpdates";
 import YearlyBreakup from "../components/dashboards/modern/YearlyBreakup";
 import MonthlyEarnings from "../components/dashboards/modern/MonthlyEarnings";
 import EmployeeSalary from "../components/dashboards/modern/EmployeeSalary";
-import Customers from "../components/dashboards/modern/Customers";
-import SellingProducts from "../components/dashboards/modern/SellingProducts";
 import TopPerformers from "../components/dashboards/modern/TopPerformers";
-import WeeklyStats from "../components/dashboards/modern/WeeklyStats";
-import Social from "../components/dashboards/modern/Social";
-import Projects from "../components/dashboards/modern/Projects";
 
 const BCrumb = [
   {
@@ -52,8 +47,11 @@ export default function Dashboard() {
           <Breadcrumb title="Profile under verification" items={BCrumb} />
         )}
 
-        <RideInsights />
-        {userState.type != "Admin" && (
+        {userState.type != "Admin" && userState.type != "Not decided" && (
+          <RideInsights />
+        )}
+
+        {userState.type != "Admin" && userState.type != "Not decided" && (
           <Grid container spacing={2}>
             <Grid item xs={12} md={12}>
               <OfferRideForm />

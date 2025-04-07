@@ -160,10 +160,6 @@ const RiderListTable = () => {
     debugColumns: false,
   });
 
-  useEffect(() => {
-    table.setPageSize(5);
-  });
-
   return (
     <DownloadCard title="Riders">
       <Grid container spacing={3}>

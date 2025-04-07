@@ -3,12 +3,7 @@
 import * as React from "react";
 import {
   Typography,
-  Box,
-  Avatar,
-  Chip,
   Paper,
-  Collapse,
-  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -16,232 +11,159 @@ import {
   TableHead,
   TableRow,
   Stack,
+  Button,
 } from "@mui/material";
-import ParentCard from "@/app/components/shared/ParentCard";
 import BlankCard from "@/app/components/shared/BlankCard";
+import ParentCard from "@/app/components/shared/ParentCard";
+import { SAMPLE_BASE_64 } from "@/constants/strings";
 
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+const sampleBase64Image = "data:image/png;base64," + SAMPLE_BASE_64;
 
-function createData(
-  imgsrc?: string,
-  pname?: string,
-  customer?: string,
-  inventory?: boolean,
-  price?: number,
-  items?: string
-) {
+function createData(pname?: string, type?: "Driver" | "Rider", image?: string) {
   return {
-    imgsrc,
     pname,
-    customer,
-    inventory,
-    price,
-    items,
-    history: [
-      { date: "2021-02-05", customerId: "15202410", price: 250, amount: 3 },
-      { date: "2021-02-02", customerId: "Anonymous", price: 600, amount: 1 },
-    ],
+    type,
+    image: image || sampleBase64Image,
   };
 }
 
 function Row(props: { row: ReturnType<typeof createData> }) {
   const { row } = props;
-  const [open, setOpen] = React.useState(false);
+
+  const handleImageClick = () => {
+    if (row.image) {
+      const newWindow = window.open("", "_blank");
+      if (newWindow) {
+        newWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Image Preview</title>
+              <style>
+                body { 
+                  margin: 0; 
+                  display: flex; 
+                  justify-content: center; 
+                  align-items: center; 
+                  height: 100vh; 
+                  background-color: #f5f5f5; 
+                }
+                .image-container {
+                  max-width: 90vw;
+                  max-height: 90vh;
+                  display: flex;
+                  justify-content: center;
+                }
+                img { 
+                  max-width: 100%; 
+                  max-height: 100%; 
+                  object-fit: contain;
+                  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+                }
+              </style>
+            </head>
+            <body>
+              <div class="image-container">
+                <img src="${row.image}" alt="Full size preview" />
+              </div>
+              <script>
+                // Close window when clicking anywhere
+                document.body.addEventListener('click', function() {
+                  window.close();
+                });
+              </script>
+            </body>
+          </html>
+        `);
+        newWindow.document.close();
+      }
+    }
+  };
+
+  const handleApprove = () => console.log("Approved:", row.pname);
+  const handleDecline = () => console.log("Declined:", row.pname);
 
   return (
-    <>
-      <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
-        <TableCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
-        <TableCell>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Avatar
-              src={row.imgsrc}
-              alt={row.imgsrc}
-              sx={{
-                width: 90,
-                height: 70,
-                borderRadius: "10px",
-              }}
-            />
-            <Typography variant="h6" fontWeight="600">
-              {row.pname}
-            </Typography>
-          </Stack>
-        </TableCell>
-        <TableCell>
-          <Typography color="textSecondary" variant="h6">
-            {row.customer}
-          </Typography>
-        </TableCell>
-        <TableCell>
-          <Chip
-            size="small"
-            label={row.inventory ? "In Stock" : "Out of Stock"}
-            color={row.inventory ? "success" : "error"}
-            sx={{ borderRadius: "6px" }}
+    <TableRow sx={{ "& .MuiTableCell-root": { verticalAlign: "middle" } }}>
+      <TableCell>
+        <Typography variant="h6" fontWeight="600">
+          {row.pname}
+        </Typography>
+      </TableCell>
+      <TableCell>
+        <Typography color="textSecondary" variant="h6">
+          {row.type}
+        </Typography>
+      </TableCell>
+      <TableCell>
+        <div
+          style={{
+            width: 50,
+            height: 50,
+            cursor: "pointer",
+            overflow: "hidden",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            border: "1px solid #eee",
+            borderRadius: 4,
+          }}
+          onClick={handleImageClick}
+        >
+          <img
+            src={row.image}
+            alt="Thumbnail"
+            style={{
+              height: "100%",
+              width: "auto",
+              maxWidth: "100%",
+              objectFit: "cover",
+            }}
           />
-        </TableCell>
-        <TableCell>
-          <Typography color="textSecondary" variant="h6" fontWeight="400">
-            ${row.price}
-          </Typography>
-        </TableCell>
-        <TableCell>
-          <Typography color="textSecondary" fontWeight="400">
-            {row.items}
-          </Typography>
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell sx={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box margin={1}>
-              <Typography
-                gutterBottom
-                variant="h5"
-                sx={{
-                  mt: 2,
-                  backgroundColor: (theme) => theme.palette.grey.A200,
-                  p: "5px 15px",
-                  color: (theme) =>
-                    `${
-                      theme.palette.mode === "dark"
-                        ? theme.palette.grey.A200
-                        : "rgba(0, 0, 0, 0.87)"
-                    }`,
-                }}
-              >
-                History
-              </Typography>
-              <Table size="small" aria-label="purchases">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>
-                      <Typography variant="h6">Date</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="h6">Customer</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="h6">Amount</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="h6">Total price ($)</Typography>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {row.history.map((historyRow: any) => (
-                    <TableRow key={historyRow.date}>
-                      <TableCell>
-                        <Typography color="textSecondary" fontWeight="400">
-                          {historyRow.date}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography color="textSecondary" fontWeight="400">
-                          {historyRow.customerId}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography color="textSecondary" fontWeight="400">
-                          {historyRow.amount}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography fontWeight="600">
-                          {Math.round(
-                            historyRow.amount * historyRow.price * 100
-                          ) / 100}
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-    </>
+        </div>
+      </TableCell>
+      <TableCell>
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Button
+            variant="contained"
+            color="success"
+            size="small"
+            onClick={handleApprove}
+          >
+            Approve
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            size="small"
+            onClick={handleDecline}
+          >
+            Decline
+          </Button>
+        </Stack>
+      </TableCell>
+    </TableRow>
   );
 }
 
 const rows = [
-  createData(
-    "/images/products/s1.jpg",
-    "Good butterscotch ice-cream",
-    "Sunil Joshi",
-    true,
-    250,
-    "2"
-  ),
-  createData(
-    "/images/products/s2.jpg",
-    "Supreme fresh tomato available",
-    "John Deo",
-    false,
-    450,
-    "1"
-  ),
-  createData(
-    "/images/products/s3.jpg",
-    "Red color candy from Gucci",
-    "Andrew McDownland",
-    false,
-    150,
-    "2"
-  ),
-  createData(
-    "/images/products/s4.jpg",
-    "Stylish night lamp for night",
-    "Christopher Jamil",
-    true,
-    550,
-    "6"
-  ),
+  createData("John Doe", "Driver"),
+  createData("Jane Smith", "Rider"),
+  createData("Mike Johnson", "Driver"),
+  createData("Sarah Williams", "Rider"),
 ];
 
 const TableCollapsible = () => (
-  <ParentCard title="Collapsible">
+  <ParentCard title="Pending Approvals (19)">
     <BlankCard>
       <TableContainer component={Paper}>
-        <Table
-          aria-label="collapsible table"
-          sx={{
-            whiteSpace: {
-              xs: "nowrap",
-              sm: "unset",
-            },
-          }}
-        >
+        <Table>
           <TableHead>
             <TableRow>
-              <TableCell />
-              <TableCell>
-                <Typography variant="h6">Product</Typography>
-              </TableCell>
-              <TableCell>
-                <Typography variant="h6">Customer</Typography>
-              </TableCell>
-              <TableCell>
-                <Typography variant="h6">Inventory</Typography>
-              </TableCell>
-              <TableCell>
-                <Typography variant="h6">Price</Typography>
-              </TableCell>
-              <TableCell>
-                <Typography variant="h6">Items</Typography>
-              </TableCell>
+              <TableCell>Name</TableCell>
+              <TableCell>Type</TableCell>
+              <TableCell>Image</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

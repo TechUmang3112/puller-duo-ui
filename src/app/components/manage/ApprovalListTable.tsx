@@ -10,12 +10,12 @@ import {
   TableBody,
   Typography,
   TableHead,
-  Chip,
   Box,
   Grid,
   MenuItem,
   Divider,
   IconButton,
+  Chip,
 } from "@mui/material";
 import { Stack } from "@mui/system";
 import DownloadCard from "@/app/components/shared/DownloadCard";
@@ -35,29 +35,30 @@ import {
   IconChevronRight,
   IconChevronsLeft,
   IconChevronsRight,
+  IconEye,
+  IconFile,
 } from "@tabler/icons-react";
-import {
-  getFormattedDateAndTime,
-  jsonDateToReadbaleFormat,
-} from "@/services/date.service";
 import Disabled from "../ui-components/rating/Disabled";
 
 export interface PaginationDataType {
-  Date: string;
-  Time: string;
-  Content: string;
+  Name: string;
+  Email: string;
+  "Date of birth": string;
+  Document: string;
 }
 
 export const basicsTableData: PaginationDataType[] = [
   {
-    Date: getFormattedDateAndTime(new Date()).Date,
-    Time: getFormattedDateAndTime(new Date()).Time,
-    Content: "Your email has been verified !",
+    Name: "Rahil Patel",
+    Email: "rahil.rider@gmail.com",
+    "Date of birth": "27-11-2004",
+    Document: "",
   },
   {
-    Date: getFormattedDateAndTime(new Date()).Date,
-    Time: getFormattedDateAndTime(new Date()).Time,
-    Content: "Your aadhaar card  has been verified !",
+    Name: "Rahil Patel",
+    Email: "rahil.rider@gmail.com",
+    "Date of birth": "27-11-2004",
+    Document: "",
   },
 ];
 
@@ -66,21 +67,8 @@ const basics = basicsTableData;
 const columnHelper = createColumnHelper<PaginationDataType>();
 
 const columns = [
-  columnHelper.accessor("Date", {
-    header: () => "Date",
-    cell: (info: any) => {
-      return (
-        <Stack direction="row" alignItems="center" spacing={2}>
-          <Box>
-            <Typography variant="h6">{info.getValue()}</Typography>
-          </Box>
-        </Stack>
-      );
-    },
-  }),
-
-  columnHelper.accessor("Time", {
-    header: () => "Time",
+  columnHelper.accessor("Name", {
+    header: () => "Name",
     cell: (info) => (
       <Typography variant="subtitle1" color="textSecondary">
         {info.getValue()}
@@ -88,17 +76,40 @@ const columns = [
     ),
   }),
 
-  columnHelper.accessor("Content", {
-    header: () => "Content",
+  columnHelper.accessor("Email", {
+    header: () => "Email",
     cell: (info) => (
       <Typography variant="subtitle1" color="textSecondary">
         {info.getValue()}
       </Typography>
+    ),
+  }),
+
+  columnHelper.accessor("Date of birth", {
+    header: () => "Date of birth",
+    cell: (info) => (
+      <Typography variant="subtitle1" color="textSecondary">
+        {info.getValue()}
+      </Typography>
+    ),
+  }),
+
+  columnHelper.accessor("Document", {
+    header: () => "Document",
+    cell: (info) => (
+      <IconButton
+        onClick={() => {
+          console.log("HERE");
+        }}
+        sx={{ "&:hover": { color: "primary.main" } }}
+      >
+        <IconEye />
+      </IconButton>
     ),
   }),
 ];
 
-const NotificationTable = () => {
+const ApprovalListTable = () => {
   const [data, _setData] = React.useState(() => [...basics]);
   const [columnFilters, setColumnFilters] = React.useState<any>([]);
   const table = useReactTable({
@@ -119,7 +130,7 @@ const NotificationTable = () => {
   });
 
   return (
-    <DownloadCard title="Notifications">
+    <DownloadCard title="Pending Approvals">
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Box>
@@ -188,7 +199,8 @@ const NotificationTable = () => {
             >
               <Box display="flex" alignItems="center" gap={1}>
                 <Typography variant="body1">
-                  {table.getPrePaginationRowModel().rows.length} Notifications
+                  {table.getPrePaginationRowModel().rows.length} Pending
+                  Approvals
                 </Typography>
               </Box>
               <Box
@@ -273,4 +285,4 @@ const NotificationTable = () => {
   );
 };
 
-export default NotificationTable;
+export default ApprovalListTable;

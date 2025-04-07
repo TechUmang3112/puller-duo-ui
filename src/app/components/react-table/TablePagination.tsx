@@ -161,10 +161,6 @@ const TablePagination = () => {
     debugColumns: false,
   });
 
-  useEffect(() => {
-    table.setPageSize(5);
-  });
-
   return (
     <DownloadCard title="My Rides">
       <Grid container spacing={3}>

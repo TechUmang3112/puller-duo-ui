@@ -112,7 +112,7 @@ const Menuitems: MenuitemsType[] = [
           id: uniqueId(),
           title: "Approvals",
           icon: IconListCheck,
-          href: "/user/approval",
+          href: "/manage/approvals",
           chipColor: "secondary",
         },
         {

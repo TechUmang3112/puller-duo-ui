@@ -164,10 +164,6 @@ const DriverListTable = () => {
     debugColumns: false,
   });
 
-  useEffect(() => {
-    table.setPageSize(5);
-  });
-
   return (
     <DownloadCard title="Drivers">
       <Grid container spacing={3}>

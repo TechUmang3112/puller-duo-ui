@@ -16,6 +16,10 @@ export const nUser = {
   updateProfile: baseUrl + "user/updateProfile",
 };
 
+export const nDriver = {
+  offerRide: baseUrl + "driver/offerRide",
+};
+
 export const nGoogle = {
   searchPlaces: baseUrl + "thirdParty/google/searchPlaces",
   measureDistance: baseUrl + "thirdParty/google/measureDistance",

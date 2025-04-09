@@ -13,6 +13,18 @@ export function showError(errorMsg: String) {
   });
 }
 
+export function showSuccess(msg: String) {
+  toast.success(msg, {
+    position: "top-right",
+    autoClose: 4000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+  });
+}
+
 export function delayInMillis(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

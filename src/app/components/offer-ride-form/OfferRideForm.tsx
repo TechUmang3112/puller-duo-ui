@@ -21,10 +21,15 @@ import { enGB } from "date-fns/locale";
 import { UserState } from "@/store/user/UserReducer";
 import { useSelector } from "@/store/hooks";
 import ChargesForRide from "./ChargesForRide";
-import { showError } from "@/services/utils.service";
+import {
+  delayInMillis,
+  showError,
+  showSuccess,
+} from "@/services/utils.service";
 import { post } from "@/services/api.service";
-import { nGoogle } from "@/constants/network";
+import { nDriver, nGoogle } from "@/constants/network";
 import { useEffect } from "react";
+import LoadingBtn from "../buttons/LoadingBtn";
 
 const OfferRideForm = () => {
   const [charges, setCharges] = React.useState<string>("");
@@ -32,12 +37,16 @@ const OfferRideForm = () => {
   const userState: UserState = useSelector((state) => state.userReducer);
   const theme = useTheme();
 
+  const [startPlace, setStartPlace] = React.useState<string>("");
   const [latC, setLatC] = React.useState<number>(0);
   const [longC, setLongC] = React.useState<number>(0);
+  const [endPlace, setEndPlace] = React.useState<string>("");
   const [latD, setLatD] = React.useState<number>(0);
   const [longD, setLongD] = React.useState<number>(0);
   const [distanceInKm, setDistanceInKm] = React.useState<number>(0);
   const [durationInMinutes, setDurationInMinutes] = React.useState<number>(0);
+
+  const [isLoading, setLoading] = React.useState<boolean>(false);
 
   useEffect(() => {
     measureDistance();
@@ -75,11 +84,6 @@ const OfferRideForm = () => {
   }
 
   async function publishRide() {
-    if (userState.isDocVerificationPending) {
-      showError("Ride can not published before document verification");
-      return {};
-    }
-
     // Additional validation for date
     if (!dateValue || dateValue < new Date()) {
       showError("Please select a future departure time");
@@ -91,7 +95,30 @@ const OfferRideForm = () => {
       return;
     }
 
-    // Your publish ride logic here
+    const body = {
+      userId: localStorage.getItem("userId"),
+      rideTime: dateValue.toJSON(),
+      totalPassengersAvailable: 1,
+      amountPerRider: +charges,
+      startPlace: startPlace,
+      endPlace: endPlace,
+      startLat: latC,
+      startLong: longC,
+      endLat: latD,
+      endLong: longD,
+    };
+    setLoading(true);
+
+    const response = await post(nDriver.offerRide, body);
+    setLoading(false);
+
+    if (response.success == true) {
+      if (response.successMsg) {
+        showSuccess(response.successMsg);
+      }
+      await delayInMillis(1500);
+      window.location.href = "/user/upcomingRides";
+    }
   }
 
   return (
@@ -126,9 +153,11 @@ const OfferRideForm = () => {
                   if (selectedOption?.value) {
                     setLatC(selectedOption?.value?.lat);
                     setLongC(selectedOption?.value?.long);
+                    setStartPlace(selectedOption.label);
                   } else {
                     setLatC(0);
                     setLongC(0);
+                    setStartPlace("");
                   }
                   measureDistance();
                 }}
@@ -141,9 +170,11 @@ const OfferRideForm = () => {
                   if (selectedOption?.value) {
                     setLatD(selectedOption?.value?.lat);
                     setLongD(selectedOption?.value?.long);
+                    setEndPlace(selectedOption.label);
                   } else {
                     setLatD(0);
                     setLongD(0);
+                    setEndPlace("");
                   }
                   measureDistance();
                 }}
@@ -237,13 +268,8 @@ const OfferRideForm = () => {
                 onChange={(value) => setCharges(value)}
               />
 
-              <Button
-                disabled={latC == 0 || !dateValue || !charges}
-                onClick={publishRide}
-                variant="contained"
-                color="primary"
-                fullWidth
-                size="large"
+              <LoadingBtn
+                isLoading={isLoading}
                 sx={{
                   mt: 4,
                   py: 1.5,
@@ -256,11 +282,33 @@ const OfferRideForm = () => {
                     boxShadow: theme.shadows[6],
                   },
                 }}
-              >
-                {userState.type === "Driver"
-                  ? "Publish a Ride"
-                  : "Search Available Rides"}
-              </Button>
+              ></LoadingBtn>
+              {!isLoading && (
+                <Button
+                  disabled={latC == 0 || !dateValue || !charges}
+                  onClick={publishRide}
+                  variant="contained"
+                  color="primary"
+                  fullWidth
+                  size="large"
+                  sx={{
+                    mt: 4,
+                    py: 1.5,
+                    borderRadius: 2,
+                    fontSize: "1rem",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    boxShadow: theme.shadows[2],
+                    "&:hover": {
+                      boxShadow: theme.shadows[6],
+                    },
+                  }}
+                >
+                  {userState.type === "Driver"
+                    ? "Publish a Ride"
+                    : "Search Available Rides"}
+                </Button>
+              )}
             </Box>
           </ChildCard>
         </Paper>

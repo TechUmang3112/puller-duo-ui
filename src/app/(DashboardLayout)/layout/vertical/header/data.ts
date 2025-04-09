@@ -1,5 +1,4 @@
 // Notifications dropdown
-
 interface notificationType {
   avatar: string;
   title: string;
@@ -49,42 +48,50 @@ const notifications: notificationType[] = [
   },
 ];
 
-//
 // Profile dropdown
-//
 interface ProfileType {
   href: string;
   title: string;
   subtitle: string;
-  icon: any;
+  icon: string;
 }
-const profile: ProfileType[] = [
-  {
-    href: "/user/profile",
-    title: "My Profile",
-    subtitle: "Account Settings",
-    icon: "/images/svgs/icon-account.svg",
-  },
-  ...(localStorage.getItem("user_type") != "2"
-    ? [
-        {
-          href: "/user/notifications",
-          title: "My Notifications",
-          subtitle: "Messages & Emails",
-          icon: "/images/svgs/icon-inbox.svg",
-        },
-        {
-          href: "/user/myRides",
-          title: "My Rides",
-          subtitle: "History & Upcoming Rides",
-          icon: "/images/svgs/icon-tasks.svg",
-        },
-      ]
-    : []),
-];
 
-// apps dropdown
+const getProfileLinks = () => {
+  const isClient = typeof window !== "undefined";
+  const userType = isClient ? localStorage.getItem("user_type") : null;
 
+  const baseProfileLinks: ProfileType[] = [
+    {
+      href: "/user/profile",
+      title: "My Profile",
+      subtitle: "Account Settings",
+      icon: "/images/svgs/icon-account.svg",
+    },
+  ];
+
+  if (userType !== "2") {
+    baseProfileLinks.push(
+      {
+        href: "/user/notifications",
+        title: "My Notifications",
+        subtitle: "Messages & Emails",
+        icon: "/images/svgs/icon-inbox.svg",
+      },
+      {
+        href: "/user/myRides",
+        title: "My Rides",
+        subtitle: "History & Upcoming Rides",
+        icon: "/images/svgs/icon-tasks.svg",
+      }
+    );
+  }
+
+  return baseProfileLinks;
+};
+
+const profile = getProfileLinks();
+
+// Apps dropdown
 interface appsLinkType {
   href: string;
   title: string;
@@ -143,6 +150,7 @@ const appsLink: appsLinkType[] = [
   },
 ];
 
+// Page links
 interface LinkType {
   href: string;
   title: string;

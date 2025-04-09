@@ -1,16 +1,28 @@
 "use client";
 
-// Imports
 import * as React from "react";
 import { Box } from "@mui/material";
-import CustomTextField from "../forms/theme-elements/CustomTextField";
-import { UserState } from "@/store/user/UserReducer";
 import { useSelector } from "@/store/hooks";
+import { UserState } from "@/store/user/UserReducer";
+import CustomTextField from "../forms/theme-elements/CustomTextField";
 
-const ChargesForRide = () => {
+interface ChargesForRideProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+const ChargesForRide = ({ value, onChange }: ChargesForRideProps) => {
   const userState: UserState = useSelector((state) => state.userReducer);
 
-  if (userState.type != "Driver") return <></>;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    // Only allow numbers and empty string
+    if (inputValue === "" || /^[0-9\b]+$/.test(inputValue)) {
+      onChange(inputValue);
+    }
+  };
+
+  if (userState.type !== "Driver") return null;
 
   return (
     <>
@@ -20,8 +32,13 @@ const ChargesForRide = () => {
         variant="outlined"
         placeholder="Charges for the ride"
         fullWidth
-        value={""}
-        onChange={(e: any) => {}}
+        value={value}
+        onChange={handleChange}
+        inputProps={{
+          inputMode: "numeric",
+          pattern: "[0-9]*",
+          min: 0,
+        }}
       />
     </>
   );

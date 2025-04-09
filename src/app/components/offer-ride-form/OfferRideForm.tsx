@@ -16,7 +16,7 @@ import CustomTextField from "../forms/theme-elements/CustomTextField";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import ComboBoxAutocomplete from "../forms/form-elements/autoComplete/ComboBoxAutocomplete";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 import { enGB } from "date-fns/locale";
 import { UserState } from "@/store/user/UserReducer";
 import { useSelector } from "@/store/hooks";
@@ -27,7 +27,8 @@ import { nGoogle } from "@/constants/network";
 import { useEffect } from "react";
 
 const OfferRideForm = () => {
-  const [dateValue, setDateValue] = React.useState(null);
+  const [charges, setCharges] = React.useState<string>("");
+  const [dateValue, setDateValue] = React.useState<Date | null>(null);
   const userState: UserState = useSelector((state) => state.userReducer);
   const theme = useTheme();
 
@@ -45,6 +46,13 @@ const OfferRideForm = () => {
   const formattedDate = dateValue
     ? format(dateValue, "dd/MM/yyyy hh:mm a", { locale: enGB })
     : "";
+
+  // Function to validate date is in future and within one week
+  const shouldDisableDate = (date: Date) => {
+    const now = new Date();
+    const oneWeekLater = addDays(now, 7);
+    return date < now || date > oneWeekLater;
+  };
 
   async function measureDistance() {
     if (!latC || !latD) {
@@ -71,6 +79,19 @@ const OfferRideForm = () => {
       showError("Ride can not published before document verification");
       return {};
     }
+
+    // Additional validation for date
+    if (!dateValue || dateValue < new Date()) {
+      showError("Please select a future departure time");
+      return;
+    }
+
+    if (dateValue > addDays(new Date(), 7)) {
+      showError("Departure time cannot be more than one week in the future");
+      return;
+    }
+
+    // Your publish ride logic here
   }
 
   return (
@@ -109,7 +130,6 @@ const OfferRideForm = () => {
                     setLatC(0);
                     setLongC(0);
                   }
-
                   measureDistance();
                 }}
                 placeholder="Leaving from..."
@@ -125,7 +145,6 @@ const OfferRideForm = () => {
                     setLatD(0);
                     setLongD(0);
                   }
-
                   measureDistance();
                 }}
                 placeholder="Going to..."
@@ -188,7 +207,7 @@ const OfferRideForm = () => {
                       fullWidth
                       value={formattedDate}
                       inputProps={{
-                        placeholder: "Select start time", // Set placeholder here
+                        placeholder: "Select start time",
                       }}
                       sx={{
                         mb: 3,
@@ -208,13 +227,18 @@ const OfferRideForm = () => {
                     setDateValue(newValue);
                   }}
                   inputFormat="dd/MM/yyyy hh:mm a"
+                  minDateTime={new Date()}
+                  maxDateTime={addDays(new Date(), 7)}
                 />
               </LocalizationProvider>
 
-              <ChargesForRide />
+              <ChargesForRide
+                value={charges}
+                onChange={(value) => setCharges(value)}
+              />
 
               <Button
-                disabled={latC == 0}
+                disabled={latC == 0 || !dateValue || !charges}
                 onClick={publishRide}
                 variant="contained"
                 color="primary"

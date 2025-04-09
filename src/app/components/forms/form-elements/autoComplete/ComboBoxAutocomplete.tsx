@@ -1,29 +1,33 @@
 "use client";
 
 // Imports
+import { get } from "@/services/api.service";
+import { nGoogle } from "@/constants/network";
 import React, { useState, useEffect } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
 import CustomTextField from "../../theme-elements/CustomTextField";
 
-interface Film {
+interface AutoCompleteOptions {
   label: string;
-  year: number;
+  value: any;
 }
 
 interface ComboBoxAutocompleteProps {
   placeholder?: string;
+  onChange?: (selectedOption: AutoCompleteOptions | null) => void; // Add this line
 }
 
 const ComboBoxAutocomplete = ({
-  placeholder = "Select movie",
+  placeholder = "Choose option",
+  onChange, // Destructure the new prop
 }: ComboBoxAutocompleteProps) => {
   const [inputValue, setInputValue] = useState(""); // State for input value
-  const [options, setOptions] = useState<Film[]>([]); // State for options
+  const [options, setOptions] = useState<AutoCompleteOptions[]>([]); // State for options
   const [loading, setLoading] = useState(false); // State for loading indicator
 
   // Function to fetch data from the backend
   const fetchData = async (query: string) => {
-    if (!query) {
+    if (!query || query?.trim()?.length <= 1) {
       setOptions([]); // Clear options if query is empty
       return;
     }
@@ -31,12 +35,19 @@ const ComboBoxAutocomplete = ({
     setLoading(true); // Show loading indicator
 
     try {
+      const response = await get(nGoogle.searchPlaces, {
+        searchText: inputValue.trim(),
+      });
+
       // Replace with your backend API endpoint
-      const backend_response = [
-        { label: "The Shawshank Redemption", year: 1994 },
-        { label: "The Godfather", year: 1972 },
-        { label: "The Godfather: Part II", year: 1974 },
-      ];
+      const backend_response: AutoCompleteOptions[] = [];
+      response.forEach((el: any) => {
+        backend_response.push({
+          label: el?.name ?? "",
+          value: el,
+        });
+      });
+
       setOptions(backend_response); // Update options with backend response
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -49,7 +60,7 @@ const ComboBoxAutocomplete = ({
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       fetchData(inputValue);
-    }, 300); // Adjust the delay as needed
+    }, 500); // Adjust the delay as needed
 
     return () => clearTimeout(delayDebounceFn);
   }, [inputValue]);
@@ -61,6 +72,12 @@ const ComboBoxAutocomplete = ({
       options={options}
       loading={loading} // Show loading indicator
       fullWidth
+      onChange={(event, newValue) => {
+        // Add this onChange handler
+        if (onChange) {
+          onChange(newValue);
+        }
+      }}
       onInputChange={(event, newInputValue) => {
         setInputValue(newInputValue); // Update input value
       }}

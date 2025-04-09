@@ -21,15 +21,57 @@ import { enGB } from "date-fns/locale";
 import { UserState } from "@/store/user/UserReducer";
 import { useSelector } from "@/store/hooks";
 import ChargesForRide from "./ChargesForRide";
+import { showError } from "@/services/utils.service";
+import { post } from "@/services/api.service";
+import { nGoogle } from "@/constants/network";
+import { useEffect } from "react";
 
 const OfferRideForm = () => {
   const [dateValue, setDateValue] = React.useState(null);
   const userState: UserState = useSelector((state) => state.userReducer);
   const theme = useTheme();
 
+  const [latC, setLatC] = React.useState<number>(0);
+  const [longC, setLongC] = React.useState<number>(0);
+  const [latD, setLatD] = React.useState<number>(0);
+  const [longD, setLongD] = React.useState<number>(0);
+  const [distanceInKm, setDistanceInKm] = React.useState<number>(0);
+  const [durationInMinutes, setDurationInMinutes] = React.useState<number>(0);
+
+  useEffect(() => {
+    measureDistance();
+  }, [latD, longD]);
+
   const formattedDate = dateValue
     ? format(dateValue, "dd/MM/yyyy hh:mm a", { locale: enGB })
     : "";
+
+  async function measureDistance() {
+    if (!latC || !latD) {
+      return {};
+    } else {
+      const body = {
+        latC,
+        longC,
+        latD,
+        longD,
+      };
+      const response = await post(nGoogle.measureDistance, body);
+      if (response.distanceInKm) {
+        setDistanceInKm(response.distanceInKm ?? 0);
+      }
+      if (response.durationInMinutes) {
+        setDurationInMinutes(response.durationInMinutes ?? 0);
+      }
+    }
+  }
+
+  async function publishRide() {
+    if (userState.isDocVerificationPending) {
+      showError("Ride can not published before document verification");
+      return {};
+    }
+  }
 
   return (
     <Container
@@ -58,48 +100,79 @@ const OfferRideForm = () => {
             }
           >
             <Box sx={{ mb: 3 }}>
-              <ComboBoxAutocomplete placeholder="Leaving from..." />
-              <Box mb={3}></Box>
+              <ComboBoxAutocomplete
+                onChange={(selectedOption) => {
+                  if (selectedOption?.value) {
+                    setLatC(selectedOption?.value?.lat);
+                    setLongC(selectedOption?.value?.long);
+                  } else {
+                    setLatC(0);
+                    setLongC(0);
+                  }
 
-              <ComboBoxAutocomplete placeholder="Going to..." />
-              <Box mb={3}></Box>
-
-              <Box
-                sx={{
-                  backgroundColor: theme.palette.grey[100],
-                  borderRadius: 2,
-                  p: 2,
-                  mb: 3,
-                  borderLeft: `4px solid ${theme.palette.primary.main}`,
+                  measureDistance();
                 }}
-              >
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <Typography variant="body1">Total distance</Typography>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 600,
-                        color: theme.palette.primary.main,
-                      }}
-                    >
-                      20 KM
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="body1">Estimated time</Typography>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 600,
-                        color: theme.palette.primary.main,
-                      }}
-                    >
-                      45 Minutes
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Box>
+                placeholder="Leaving from..."
+              />
+              <Box mb={3}></Box>
+
+              <ComboBoxAutocomplete
+                onChange={(selectedOption) => {
+                  if (selectedOption?.value) {
+                    setLatD(selectedOption?.value?.lat);
+                    setLongD(selectedOption?.value?.long);
+                  } else {
+                    setLatD(0);
+                    setLongD(0);
+                  }
+
+                  measureDistance();
+                }}
+                placeholder="Going to..."
+              />
+              <Box mb={3}></Box>
+
+              {latC != 0 &&
+                latD != 0 &&
+                distanceInKm != 0 &&
+                durationInMinutes != 0 && (
+                  <Box
+                    sx={{
+                      backgroundColor: theme.palette.grey[100],
+                      borderRadius: 2,
+                      p: 2,
+                      mb: 3,
+                      borderLeft: `4px solid ${theme.palette.primary.main}`,
+                    }}
+                  >
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <Typography variant="body1">Total distance</Typography>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: 600,
+                            color: theme.palette.primary.main,
+                          }}
+                        >
+                          {distanceInKm} KM
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Typography variant="body1">Estimated time</Typography>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: 600,
+                            color: theme.palette.primary.main,
+                          }}
+                        >
+                          {durationInMinutes} Minutes
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                )}
 
               <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 500 }}>
                 Departure Date & Time
@@ -141,6 +214,8 @@ const OfferRideForm = () => {
               <ChargesForRide />
 
               <Button
+                disabled={latC == 0}
+                onClick={publishRide}
                 variant="contained"
                 color="primary"
                 fullWidth

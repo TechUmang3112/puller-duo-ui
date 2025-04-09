@@ -15,3 +15,8 @@ export const nUser = {
   profile: baseUrl + "user/profile",
   updateProfile: baseUrl + "user/updateProfile",
 };
+
+export const nGoogle = {
+  searchPlaces: baseUrl + "thirdParty/google/searchPlaces",
+  measureDistance: baseUrl + "thirdParty/google/measureDistance",
+};

@@ -1,19 +1,18 @@
-// Imports
 import * as React from "react";
-import { Box } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
+import { SxProps, Theme } from "@mui/material/styles";
 
 interface LoadingBtnProps {
   isLoading: boolean;
-  sx?: any;
+  sx?: SxProps<Theme>;
 }
 
 const LoadingBtn = ({ isLoading, sx }: LoadingBtnProps) => {
-  if (!isLoading) return <></>;
+  if (!isLoading) return null;
 
   return (
     <LoadingButton
-      sx={...sx}
+      sx={sx} // Removed the spread operator
       fullWidth
       loading
       variant="contained"

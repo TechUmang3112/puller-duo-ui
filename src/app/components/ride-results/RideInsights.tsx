@@ -1,17 +1,18 @@
 // Imports
+import React from "react";
 import {
   IconCalendar,
   IconCar,
   IconListDetails,
-  IconShoppingBag,
-  IconSortAscending,
   IconStack,
-  IconTruck,
 } from "@tabler/icons-react";
-import React from "react";
+import { AppState } from "@/store/store";
+import { useSelector } from "@/store/hooks";
 import { Box, Grid, Stack, Typography } from "@mui/material";
 
 function RideInsights() {
+  const rideState = useSelector((state: AppState) => state.rideReducer);
+
   return (
     <Box mb={3}>
       <Grid container spacing={3}>
@@ -20,7 +21,9 @@ function RideInsights() {
           <Box
             bgcolor="primary.light"
             p={3}
-            onClick={() => {}}
+            onClick={() => {
+              window.location.href = "/user/myRides";
+            }}
             sx={{ cursor: "pointer" }}
           >
             <Stack direction="row" gap={2} alignItems="center">
@@ -43,7 +46,9 @@ function RideInsights() {
               </Box>
               <Box>
                 <Typography>Total</Typography>
-                <Typography fontWeight={500}>10 Rides</Typography>
+                <Typography fontWeight={500}>
+                  {rideState.count.total} Rides
+                </Typography>
               </Box>
             </Stack>
           </Box>
@@ -54,7 +59,9 @@ function RideInsights() {
           <Box
             bgcolor="warning.light"
             p={3}
-            onClick={() => {}}
+            onClick={() => {
+              window.location.href = "/user/upcomingRides";
+            }}
             sx={{ cursor: "pointer" }}
           >
             <Stack direction="row" gap={2} alignItems="center">
@@ -77,7 +84,9 @@ function RideInsights() {
               </Box>
               <Box>
                 <Typography>Upcoming</Typography>
-                <Typography fontWeight={500}>3 Rides</Typography>
+                <Typography fontWeight={500}>
+                  {rideState.count.upcoming} Rides
+                </Typography>
               </Box>
             </Stack>
           </Box>
@@ -111,7 +120,9 @@ function RideInsights() {
               </Box>
               <Box>
                 <Typography>Current</Typography>
-                <Typography fontWeight={500}>1 Ride</Typography>
+                <Typography fontWeight={500}>
+                  {rideState.count.current} Ride
+                </Typography>
               </Box>
             </Stack>
           </Box>
@@ -145,7 +156,9 @@ function RideInsights() {
               </Box>
               <Box>
                 <Typography>Completed</Typography>
-                <Typography fontWeight={500}>6 Rides</Typography>
+                <Typography fontWeight={500}>
+                  {rideState.count.completed} Rides
+                </Typography>
               </Box>
             </Stack>
           </Box>

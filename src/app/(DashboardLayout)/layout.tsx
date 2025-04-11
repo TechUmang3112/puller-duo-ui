@@ -22,6 +22,8 @@ import {
   setName,
   setType,
 } from "@/store/user/UserReducer";
+import { checkProfileStatus } from "@/services/user.service";
+import { setCount } from "@/store/ride/RideReducer";
 
 const MainWrapper = styled("div")(() => ({
   display: "flex",
@@ -61,12 +63,15 @@ export default function RootLayout({
     const response = await get(nUser.profile, { userId });
     if (!response.isError) {
       localStorage.setItem("user_name", response.name ?? "User");
-      localStorage.setItem(
-        "user_email",
-        response.email ?? "user@pullerduo.com"
-      );
+      localStorage.setItem("user_email", response.email ?? "");
       localStorage.setItem("user_type", response.type ?? "-1");
       dispatch(setName(response.name ?? "User"));
+
+      // First time forceful redirection to update user profile
+      if (response.type != "-1") {
+        localStorage.setItem("isProfileUpdated", "true");
+        getRideCounts();
+      }
 
       // Set the user type
       const user_type = response.type ?? -1;
@@ -87,6 +92,17 @@ export default function RootLayout({
       } else if (response.gender == "1") {
         dispatch(setGender("Female"));
       }
+    }
+
+    checkProfileStatus();
+  }
+
+  async function getRideCounts() {
+    const response = await get(nUser.getRideCounts, {
+      userId: localStorage.getItem("userId"),
+    });
+    if (response.count) {
+      dispatch(setCount(response.count));
     }
   }
 

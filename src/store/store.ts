@@ -14,6 +14,7 @@ import ContactsReducer from "./apps/contacts/ContactSlice";
 import UserProfileReducer from "./apps/userProfile/UserProfileSlice";
 import BlogReducer from "./apps/blog/BlogSlice";
 import userReducer from "./user/UserReducer";
+import rideReducer from "./ride/RideReducer";
 
 const persistConfig = {
   key: "root",
@@ -23,6 +24,7 @@ const persistConfig = {
 export const store = configureStore({
   reducer: {
     userReducer: userReducer,
+    rideReducer: rideReducer,
     counter: counterReducer,
     customizer: persistReducer<any>(persistConfig, CustomizerReducer),
     ecommerceReducer: EcommerceReducer,
@@ -41,6 +43,7 @@ export const store = configureStore({
 
 const rootReducer = combineReducers({
   userReducer: userReducer,
+  rideReducer: rideReducer,
   counter: counterReducer,
   customizer: CustomizerReducer,
   ecommerceReducer: EcommerceReducer,

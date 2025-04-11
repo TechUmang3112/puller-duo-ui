@@ -14,6 +14,7 @@ export const nAuth = {
 export const nUser = {
   profile: baseUrl + "user/profile",
   updateProfile: baseUrl + "user/updateProfile",
+  getRideCounts: baseUrl + "user/getRideCounts",
 };
 
 export const nDriver = {

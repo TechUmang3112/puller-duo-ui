@@ -4,7 +4,6 @@
 import React from "react";
 import { Button, Grid } from "@mui/material";
 import ParentCard from "../shared/ParentCard";
-import { checkDocumentStatus } from "@/services/user.service";
 import CustomTextField from "../forms/theme-elements/CustomTextField";
 import CustomFormLabel from "../forms/theme-elements/CustomFormLabel";
 
@@ -30,7 +29,6 @@ const ChangePasswordForm = () => {
               onClick={() => {
                 localStorage.setItem("isProfileUpdated", "true");
                 localStorage.setItem("isDocUnderVerification", "true");
-                checkDocumentStatus();
               }}
             >
               Submit

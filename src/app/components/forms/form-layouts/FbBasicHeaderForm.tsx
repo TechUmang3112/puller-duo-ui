@@ -52,6 +52,8 @@ const FbBasicHeaderForm = () => {
 
   const [name, setName] = useState("");
   const [nameError, setNameError] = useState("");
+  const [dob, setDob] = useState("");
+  const [dobError, setDobError] = useState("");
 
   const [currency, setCurrency] = useState("");
   const [currencyError, setCurrencyError] = useState("");
@@ -69,6 +71,8 @@ const FbBasicHeaderForm = () => {
   };
 
   useEffect(() => {
+    setName(localStorage.getItem("user_name") ?? "");
+
     if (["Driver", "Rider"].includes(userState.type)) {
       setUserType(userState.type);
     }
@@ -76,10 +80,11 @@ const FbBasicHeaderForm = () => {
     if (userState.gender) {
       setCurrency(userState.gender);
     }
-  }, []);
 
-  const [dob, setDob] = useState("");
-  const [dobError, setDobError] = useState("");
+    if (userState.dob) {
+      setDob(userState.dob);
+    }
+  }, [userState.type, userState.gender, userState.dob]);
 
   // State for image upload
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -177,7 +182,7 @@ const FbBasicHeaderForm = () => {
       }
     }
 
-    if (!selectedImage) {
+    if (!selectedImage && userState.type == "Not decided") {
       setImageError(
         userType === "Driver"
           ? "Driver license is required"
@@ -221,14 +226,6 @@ const FbBasicHeaderForm = () => {
       // Handle API error here
     }
   }
-
-  useEffect(() => {
-    setName(localStorage.getItem("user_name") ?? "");
-
-    if (userState.dob) {
-      setDob(userState.dob);
-    }
-  }, []);
 
   return (
     <div>
@@ -378,7 +375,7 @@ const FbBasicHeaderForm = () => {
             </Grid>
 
             {/* Upload Driver License Section */}
-            {userType && (
+            {userType && userState.type == "Not decided" && (
               <Grid container spacing={3} mb={3}>
                 <Grid item xs={12}>
                   <input

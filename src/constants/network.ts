@@ -15,6 +15,7 @@ export const nUser = {
   profile: baseUrl + "user/profile",
   updateProfile: baseUrl + "user/updateProfile",
   getRideCounts: baseUrl + "user/getRideCounts",
+  upcomingRideList: baseUrl + "user/upcomingRideList",
 };
 
 export const nDriver = {

@@ -1,7 +1,7 @@
 "use client";
 
 // Imports
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   TableContainer,
   Table,
@@ -41,6 +41,8 @@ import {
   jsonDateToReadbaleFormat,
 } from "@/services/date.service";
 import Disabled from "../ui-components/rating/Disabled";
+import { get } from "@/services/api.service";
+import { nUser } from "@/constants/network";
 
 export interface PaginationDataType {
   Date?: string;
@@ -50,54 +52,12 @@ export interface PaginationDataType {
   "Ride cost": number;
 }
 
-export const basicsTableData: PaginationDataType[] = [
-  {
-    Date: getFormattedDateAndTime(new Date()).Date,
-    Time: getFormattedDateAndTime(new Date()).Time,
-    "Starting point": "Sanand",
-    "Ending point": "Thaltej - Metro station",
-    "Ride cost": 500,
-  },
-  {
-    Date: getFormattedDateAndTime(new Date()).Date,
-    Time: getFormattedDateAndTime(new Date()).Time,
-    "Starting point": "Thaltej - Metro station",
-    "Ending point": "Vastral - Metro station",
-    "Ride cost": 900,
-  },
-  {
-    Date: getFormattedDateAndTime(new Date()).Date,
-    Time: getFormattedDateAndTime(new Date()).Time,
-    "Starting point": "Thaltej - Metro station",
-    "Ending point": "Gota",
-    "Ride cost": 900,
-  },
-  {
-    Date: getFormattedDateAndTime(new Date()).Date,
-    Time: getFormattedDateAndTime(new Date()).Time,
-    "Starting point": "Thaltej - Metro station",
-    "Ending point": "Vastral - Metro station",
-    "Ride cost": 900,
-  },
-  {
-    Date: getFormattedDateAndTime(new Date()).Date,
-    Time: getFormattedDateAndTime(new Date()).Time,
-    "Starting point": "Thaltej - Metro station",
-    "Ending point": "Gota",
-    "Ride cost": 900,
-  },
-];
-
-const basics = basicsTableData;
-
 const columnHelper = createColumnHelper<PaginationDataType>();
 
 const columns = [
   columnHelper.accessor("Date", {
     header: () => "Date",
     cell: (info: any) => {
-      console.log("info", info);
-
       return (
         <Stack direction="row" alignItems="center" spacing={2}>
           <Box>
@@ -146,8 +106,10 @@ const columns = [
 ];
 
 const UpcomingTable = () => {
-  const [data, _setData] = React.useState(() => [...basics]);
+  const [data, setData] = useState<PaginationDataType[]>([]);
+  const [loading, setLoading] = useState(true);
   const [columnFilters, setColumnFilters] = React.useState<any>([]);
+
   const table = useReactTable({
     data,
     columns,
@@ -157,13 +119,64 @@ const UpcomingTable = () => {
     },
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(), //client side filtering
+    getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     debugTable: true,
     debugHeaders: true,
     debugColumns: false,
   });
+
+  useEffect(() => {
+    getUpcomingRides();
+  }, []);
+
+  async function getUpcomingRides() {
+    try {
+      setLoading(true);
+      const response = await get(nUser.upcomingRideList, {
+        userId: localStorage.getItem("userId"),
+      });
+
+      if (response.list && Array.isArray(response.list)) {
+        // Transform API data to match table structure
+        const formattedData = response.list.map((ride: any) => ({
+          Date: getFormattedDateAndTime(new Date(ride.rideTime)).Date,
+          Time: getFormattedDateAndTime(new Date(ride.rideTime)).Time,
+          "Starting point": ride.startPlace || "N/A",
+          "Ending point": ride.endPlace || "N/A",
+          "Ride cost": ride.total_payment || 0,
+        }));
+
+        setData(formattedData);
+      }
+    } catch (error) {
+      console.error("Error fetching upcoming rides:", error);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <DownloadCard title="My Upcoming Rides">
+        <Typography variant="body1" p={3}>
+          Loading rides...
+        </Typography>
+      </DownloadCard>
+    );
+  }
+
+  if (!data.length) {
+    return (
+      <DownloadCard title="My Upcoming Rides">
+        <Typography variant="body1" p={3}>
+          No upcoming rides found
+        </Typography>
+      </DownloadCard>
+    );
+  }
 
   return (
     <DownloadCard title="My Upcoming Rides">

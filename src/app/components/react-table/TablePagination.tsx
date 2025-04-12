@@ -1,7 +1,7 @@
 "use client";
 
 // Imports
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   TableContainer,
   Table,
@@ -19,10 +19,7 @@ import {
 } from "@mui/material";
 import { Stack } from "@mui/system";
 import DownloadCard from "@/app/components/shared/DownloadCard";
-import {
-  basicsTableData,
-  PaginationDataType,
-} from "@/app/(DashboardLayout)/react-tables/pagination/PaginationData";
+import { PaginationDataType } from "@/app/(DashboardLayout)/react-tables/pagination/PaginationData";
 import {
   flexRender,
   getCoreRowModel,
@@ -40,29 +37,47 @@ import {
   IconChevronsLeft,
   IconChevronsRight,
 } from "@tabler/icons-react";
-import { jsonDateToReadbaleFormat } from "@/services/date.service";
+import {
+  getFormattedDateAndTime,
+  jsonDateToReadbaleFormat,
+} from "@/services/date.service";
 import Disabled from "../ui-components/rating/Disabled";
+import { nUser } from "@/constants/network";
+import { get } from "@/services/api.service";
 
-const basics = basicsTableData;
+interface RideData {
+  Date: string;
+  Time?: string;
+  "Starting point": string;
+  "Ending point": string;
+  "Ride cost": number;
+  Rating?: number;
+  status: "active" | "pending" | "completed" | "cancel";
+}
 
-const columnHelper = createColumnHelper<PaginationDataType>();
+const columnHelper = createColumnHelper<RideData>();
 
 const columns = [
   columnHelper.accessor("Date", {
     header: () => "Date",
     cell: (info: any) => {
-      console.log("info", info);
-
       return (
         <Stack direction="row" alignItems="center" spacing={2}>
           <Box>
-            <Typography variant="h6">
-              {jsonDateToReadbaleFormat(info.getValue())}
-            </Typography>
+            <Typography variant="h6">{info.getValue()}</Typography>
           </Box>
         </Stack>
       );
     },
+  }),
+
+  columnHelper.accessor("Time", {
+    header: () => "Time",
+    cell: (info) => (
+      <Typography variant="subtitle1" color="textSecondary">
+        {info.getValue()}
+      </Typography>
+    ),
   }),
 
   columnHelper.accessor("Starting point", {
@@ -142,8 +157,10 @@ const columns = [
 ];
 
 const TablePagination = () => {
-  const [data, _setData] = React.useState(() => [...basics]);
+  const [data, setData] = useState<RideData[]>([]);
+  const [loading, setLoading] = useState(true);
   const [columnFilters, setColumnFilters] = React.useState<any>([]);
+
   const table = useReactTable({
     data,
     columns,
@@ -153,13 +170,65 @@ const TablePagination = () => {
     },
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(), //client side filtering
+    getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     debugTable: true,
     debugHeaders: true,
     debugColumns: false,
   });
+
+  useEffect(() => {
+    getRides();
+  }, []);
+
+  async function getRides() {
+    try {
+      setLoading(true);
+      const response = await get(nUser.allRidesList, {
+        userId: localStorage.getItem("userId"),
+      });
+
+      if (response.list) {
+        // Transform the API data to match your table structure
+        const formattedData = response.list.map((ride: any) => ({
+          Date: getFormattedDateAndTime(new Date(ride.rideTime)).Date,
+          Time: getFormattedDateAndTime(new Date(ride.rideTime)).Time,
+          "Starting point": ride.startPlace || "Unknown",
+          "Ending point": ride.endPlace || "Unknown",
+          "Ride cost": ride.total_payment || 0,
+          Rating: ride.rating || undefined,
+          status: ride.status == "-1" ? "pending" : "pending",
+        }));
+
+        setData(formattedData);
+      }
+    } catch (error) {
+      console.error("Error fetching rides:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <DownloadCard title="My Rides">
+        <Typography variant="body1" p={3}>
+          Loading rides...
+        </Typography>
+      </DownloadCard>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <DownloadCard title="My Rides">
+        <Typography variant="body1" p={3}>
+          No rides found
+        </Typography>
+      </DownloadCard>
+    );
+  }
 
   return (
     <DownloadCard title="My Rides">

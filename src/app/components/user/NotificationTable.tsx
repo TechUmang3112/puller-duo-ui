@@ -1,7 +1,7 @@
 "use client";
 
 // Imports
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   TableContainer,
   Table,
@@ -41,27 +41,14 @@ import {
   jsonDateToReadbaleFormat,
 } from "@/services/date.service";
 import Disabled from "../ui-components/rating/Disabled";
+import { nUser } from "@/constants/network";
+import { get } from "@/services/api.service";
 
 export interface PaginationDataType {
   Date: string;
   Time: string;
   Content: string;
 }
-
-export const basicsTableData: PaginationDataType[] = [
-  {
-    Date: getFormattedDateAndTime(new Date()).Date,
-    Time: getFormattedDateAndTime(new Date()).Time,
-    Content: "Your email has been verified !",
-  },
-  {
-    Date: getFormattedDateAndTime(new Date()).Date,
-    Time: getFormattedDateAndTime(new Date()).Time,
-    Content: "Your aadhaar card  has been verified !",
-  },
-];
-
-const basics = basicsTableData;
 
 const columnHelper = createColumnHelper<PaginationDataType>();
 
@@ -99,8 +86,9 @@ const columns = [
 ];
 
 const NotificationTable = () => {
-  const [data, _setData] = React.useState(() => [...basics]);
-  const [columnFilters, setColumnFilters] = React.useState<any>([]);
+  const [data, setData] = useState<PaginationDataType[]>([]);
+  const [columnFilters, setColumnFilters] = useState<any>([]);
+
   const table = useReactTable({
     data,
     columns,
@@ -117,6 +105,34 @@ const NotificationTable = () => {
     debugHeaders: true,
     debugColumns: false,
   });
+
+  useEffect(() => {
+    getNotifications();
+  }, []);
+
+  async function getNotifications() {
+    try {
+      const response = await get(nUser.notifications, {
+        userId: localStorage.getItem("userId"),
+      });
+
+      if (response?.list) {
+        // Transform the API response to match the table data structure
+        const formattedData = response.list.map((notification: any) => {
+          return {
+            Date: getFormattedDateAndTime(new Date(notification.dateTime)).Date,
+            Time: getFormattedDateAndTime(new Date(notification.dateTime)).Time,
+            Content:
+              notification.message || notification.content || "Notification",
+          };
+        });
+        setData(formattedData);
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      // You might want to show an error message to the user here
+    }
+  }
 
   return (
     <DownloadCard title="Notifications">
@@ -163,109 +179,121 @@ const NotificationTable = () => {
                   ))}
                 </TableHead>
                 <TableBody>
-                  {table.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id}>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
+                  {table.getRowModel().rows.length > 0 ? (
+                    table.getRowModel().rows.map((row) => (
+                      <TableRow key={row.id}>
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id}>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={columns.length} align="center">
+                        <Typography variant="subtitle1" color="textSecondary">
+                          No notifications found
+                        </Typography>
+                      </TableCell>
                     </TableRow>
-                  ))}
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>
             <Divider />
-            <Stack
-              gap={1}
-              p={3}
-              alignItems="center"
-              direction={{ xs: "column", sm: "row" }}
-              justifyContent="space-between"
-            >
-              <Box display="flex" alignItems="center" gap={1}>
-                <Typography variant="body1">
-                  {table.getPrePaginationRowModel().rows.length} Notifications
-                </Typography>
-              </Box>
-              <Box
-                sx={{
-                  display: {
-                    xs: "block",
-                    sm: "flex",
-                  },
-                }}
-                alignItems="center"
+            {data.length > 0 && (
+              <Stack
                 gap={1}
+                p={3}
+                alignItems="center"
+                direction={{ xs: "column", sm: "row" }}
+                justifyContent="space-between"
               >
-                <Stack direction="row" alignItems="center" gap={1}>
-                  <Typography variant="body1">Page</Typography>
-                  <Typography variant="body1" fontWeight={600}>
-                    {table.getState().pagination.pageIndex + 1} of{" "}
-                    {table.getPageCount()}
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Typography variant="body1">
+                    {table.getPrePaginationRowModel().rows.length} Notifications
                   </Typography>
-                </Stack>
-                <Stack direction="row" alignItems="center" gap={1}>
-                  | Go to page:
-                  <CustomTextField
-                    type="number"
-                    min="1"
-                    max={table.getPageCount()}
-                    defaultValue={table.getState().pagination.pageIndex + 1}
-                    onChange={(e: { target: { value: any } }) => {
-                      const page = e.target.value
-                        ? Number(e.target.value) - 1
-                        : 0;
-                      table.setPageIndex(page);
-                    }}
-                  />
-                </Stack>
-                <CustomSelect
-                  value={table.getState().pagination.pageSize}
-                  onChange={(e: { target: { value: any } }) => {
-                    table.setPageSize(Number(e.target.value));
+                </Box>
+                <Box
+                  sx={{
+                    display: {
+                      xs: "block",
+                      sm: "flex",
+                    },
                   }}
+                  alignItems="center"
+                  gap={1}
                 >
-                  {[5, 10, 15, 20, 25].map((pageSize) => (
-                    <MenuItem key={pageSize} value={pageSize}>
-                      {pageSize}
-                    </MenuItem>
-                  ))}
-                </CustomSelect>
+                  <Stack direction="row" alignItems="center" gap={1}>
+                    <Typography variant="body1">Page</Typography>
+                    <Typography variant="body1" fontWeight={600}>
+                      {table.getState().pagination.pageIndex + 1} of{" "}
+                      {table.getPageCount()}
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" alignItems="center" gap={1}>
+                    | Go to page:
+                    <CustomTextField
+                      type="number"
+                      min="1"
+                      max={table.getPageCount()}
+                      defaultValue={table.getState().pagination.pageIndex + 1}
+                      onChange={(e: { target: { value: any } }) => {
+                        const page = e.target.value
+                          ? Number(e.target.value) - 1
+                          : 0;
+                        table.setPageIndex(page);
+                      }}
+                    />
+                  </Stack>
+                  <CustomSelect
+                    value={table.getState().pagination.pageSize}
+                    onChange={(e: { target: { value: any } }) => {
+                      table.setPageSize(Number(e.target.value));
+                    }}
+                  >
+                    {[5, 10, 15, 20, 25].map((pageSize) => (
+                      <MenuItem key={pageSize} value={pageSize}>
+                        {pageSize}
+                      </MenuItem>
+                    ))}
+                  </CustomSelect>
 
-                <IconButton
-                  size="small"
-                  onClick={() => table.setPageIndex(0)}
-                  disabled={!table.getCanPreviousPage()}
-                >
-                  <IconChevronsLeft />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={() => table.previousPage()}
-                  disabled={!table.getCanPreviousPage()}
-                >
-                  <IconChevronLeft />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={() => table.nextPage()}
-                  disabled={!table.getCanNextPage()}
-                >
-                  <IconChevronRight />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                  disabled={!table.getCanNextPage()}
-                >
-                  <IconChevronsRight />
-                </IconButton>
-              </Box>
-            </Stack>
+                  <IconButton
+                    size="small"
+                    onClick={() => table.setPageIndex(0)}
+                    disabled={!table.getCanPreviousPage()}
+                  >
+                    <IconChevronsLeft />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                  >
+                    <IconChevronLeft />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                  >
+                    <IconChevronRight />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                    disabled={!table.getCanNextPage()}
+                  >
+                    <IconChevronsRight />
+                  </IconButton>
+                </Box>
+              </Stack>
+            )}
           </Box>
         </Grid>
       </Grid>

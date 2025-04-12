@@ -18,6 +18,7 @@ export const nUser = {
   upcomingRideList: baseUrl + "user/upcomingRideList",
   allRidesList: baseUrl + "user/allRidesList",
   changePassword: baseUrl + "user/changePassword",
+  notifications: baseUrl + "user/notifications",
 };
 
 export const nDriver = {

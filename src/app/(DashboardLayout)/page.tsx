@@ -16,6 +16,7 @@ import YearlyBreakup from "../components/dashboards/modern/YearlyBreakup";
 import MonthlyEarnings from "../components/dashboards/modern/MonthlyEarnings";
 import EmployeeSalary from "../components/dashboards/modern/EmployeeSalary";
 import TopPerformers from "../components/dashboards/modern/TopPerformers";
+import BannerCard from "../components/widgets/cards/BannerCard";
 
 const BCrumb = [
   {
@@ -35,6 +36,7 @@ const BCrumb = [
 export default function Dashboard() {
   const [isLoading, setLoading] = useState(true);
   const userState = useSelector((state: AppState) => state.userReducer);
+  const rideState = useSelector((state: AppState) => state.rideReducer);
 
   useEffect(() => {
     setLoading(false);
@@ -57,11 +59,13 @@ export default function Dashboard() {
               <OfferRideForm />
             </Grid>
 
-            {userState.type == "Rider" && (
+            {userState.type == "Rider" && rideState.isSearchedForRide && (
               <Grid item xs={6} md={12}>
                 <RideResults />
               </Grid>
             )}
+
+            {userState.type == "Rider" && <BannerCard />}
           </Grid>
         )}
 

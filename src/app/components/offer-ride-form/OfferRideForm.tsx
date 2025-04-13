@@ -30,7 +30,10 @@ import { post } from "@/services/api.service";
 import { nDriver, nGoogle, nRider } from "@/constants/network";
 import { useEffect } from "react";
 import LoadingBtn from "../buttons/LoadingBtn";
-import { setAvailableRides } from "@/store/ride/RideReducer";
+import {
+  setAvailableRides,
+  setIsSearchedForRide,
+} from "@/store/ride/RideReducer";
 
 const OfferRideForm = () => {
   const dispatch = useDispatch();
@@ -118,6 +121,7 @@ const OfferRideForm = () => {
       };
 
       response = await post(nRider.findRide, body);
+      dispatch(setIsSearchedForRide(true));
       if (response.list != null && response.list != undefined) {
         dispatch(setAvailableRides(response.list));
       }

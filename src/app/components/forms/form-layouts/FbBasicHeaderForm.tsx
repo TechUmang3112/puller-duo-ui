@@ -67,7 +67,6 @@ const FbBasicHeaderForm = () => {
   const onUserTypeChange = (event: any) => {
     setUserType(event.target.value);
     setUserTypeError("");
-    dispatch(setType(event.target.value));
   };
 
   useEffect(() => {
@@ -216,6 +215,7 @@ const FbBasicHeaderForm = () => {
       await post(nUser.updateProfile, body, {
         "Content-Type": "multipart/form-data",
       });
+      dispatch(setType(userType));
       dispatch(setIsAuthLoading(false));
 
       localStorage.setItem("isProfileUpdated", "true");
@@ -375,61 +375,67 @@ const FbBasicHeaderForm = () => {
             </Grid>
 
             {/* Upload Driver License Section */}
-            {userType && userState.type == "Not decided" && (
-              <Grid container spacing={3} mb={3}>
-                <Grid item xs={12}>
-                  <input
-                    disabled={userState.isAuthLoading}
-                    accept="image/*"
-                    id="user-doc"
-                    type="file"
-                    style={{ display: "none" }}
-                    onChange={handleImageUpload}
-                    ref={fileInputRef}
-                  />
-                  <label htmlFor="user-doc">
-                    {!imagePreview && (
-                      <Button
-                        variant="contained"
-                        component="span"
-                        color="primary"
-                        sx={{ mr: 2 }}
+            {userType &&
+              (userState.type == "Not decided" || userState.type == "User") && (
+                <Grid container spacing={3} mb={3}>
+                  <Grid item xs={12}>
+                    <input
+                      disabled={userState.isAuthLoading}
+                      accept="image/*"
+                      id="user-doc"
+                      type="file"
+                      style={{ display: "none" }}
+                      onChange={handleImageUpload}
+                      ref={fileInputRef}
+                    />
+                    <label htmlFor="user-doc">
+                      {!imagePreview && (
+                        <Button
+                          variant="contained"
+                          component="span"
+                          color="primary"
+                          sx={{ mr: 2 }}
+                        >
+                          {userType == "Driver"
+                            ? "Upload Driver License"
+                            : "Upload Aadhaar card"}
+                        </Button>
+                      )}
+                    </label>
+                    {imageError && (
+                      <Box
+                        color="error.main"
+                        fontSize="0.75rem"
+                        mt={0.5}
+                        ml={2}
                       >
-                        {userType == "Driver"
-                          ? "Upload Driver License"
-                          : "Upload Aadhaar card"}
-                      </Button>
+                        {imageError}
+                      </Box>
                     )}
-                  </label>
-                  {imageError && (
-                    <Box color="error.main" fontSize="0.75rem" mt={0.5} ml={2}>
-                      {imageError}
-                    </Box>
-                  )}
-                  {imagePreview && (
-                    <Box mt={2} position="relative" display="inline-block">
-                      <img
-                        src={imagePreview}
-                        alt="User doc Preview"
-                        style={{ maxWidth: "100%", maxHeight: "200px" }}
-                      />
-                      <IconButton
-                        onClick={handleRemoveImage}
-                        sx={{
-                          position: "absolute",
-                          top: 0,
-                          right: 0,
-                          color: "red",
-                          backgroundColor: "white",
-                        }}
-                      >
-                        <CloseIcon />
-                      </IconButton>
-                    </Box>
-                  )}
+                    {imagePreview && (
+                      <Box mt={2} position="relative" display="inline-block">
+                        <img
+                          src={imagePreview}
+                          alt="User doc Preview"
+                          style={{ maxWidth: "100%", maxHeight: "200px" }}
+                        />
+                        <IconButton
+                          onClick={handleRemoveImage}
+                          sx={{
+                            position: "absolute",
+                            top: 0,
+                            right: 0,
+                            color: "red",
+                            backgroundColor: "white",
+                          }}
+                        >
+                          <CloseIcon />
+                        </IconButton>
+                      </Box>
+                    )}
+                  </Grid>
                 </Grid>
-              </Grid>
-            )}
+              )}
           </form>
         </>
       </ParentCard>

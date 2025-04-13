@@ -18,11 +18,17 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 
 interface RideDialogProps {
   open: boolean;
+  rideData: any;
   onClose: () => void;
   onAccept: () => void;
 }
 
-const RideDialog: React.FC<RideDialogProps> = ({ open, onClose, onAccept }) => {
+const RideDialog: React.FC<RideDialogProps> = ({
+  rideData,
+  open,
+  onClose,
+  onAccept,
+}) => {
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
 
   const handleAccept = () => {
@@ -48,37 +54,89 @@ const RideDialog: React.FC<RideDialogProps> = ({ open, onClose, onAccept }) => {
         onClose={onClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        sx={{
+          "& .MuiDialog-paper": {
+            width: "400px", // Fixed width
+            borderRadius: "12px", // Rounded corners
+            padding: "20px", // Overall padding
+          },
+        }}
       >
-        <DialogTitle id="alert-dialog-title">{"Accept the Ride"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
+        <DialogTitle
+          id="alert-dialog-title"
+          sx={{
+            fontSize: "1.5rem",
+            fontWeight: "600",
+            padding: "16px 24px",
+            color: "#1976d2",
+          }}
+        >
+          {"Accept the Ride"}
+        </DialogTitle>
+        <DialogContent sx={{ padding: "20px 24px" }}>
+          <DialogContentText
+            id="alert-dialog-description"
+            sx={{
+              fontSize: "1rem",
+              color: "text.primary",
+              "& > div": {
+                marginTop: "12px",
+                marginBottom: "12px",
+              },
+            }}
+          >
             <div style={{ lineHeight: "1.6" }}>
               <div>
                 <span style={{ fontWeight: "bold", color: "#1976d2" }}>
                   From:
                 </span>{" "}
-                Point A
+                {(rideData ?? {})["Starting point"] ?? ""}
               </div>
               <div>
                 <span style={{ fontWeight: "bold", color: "#1976d2" }}>
                   To:
                 </span>{" "}
-                Point B
+                {(rideData ?? {})["Ending point"] ?? ""}
               </div>
               <div>
                 <span style={{ fontWeight: "bold", color: "#1976d2" }}>
                   Charges:
                 </span>{" "}
-                Rs. 1000
+                Rs. {(rideData ?? {})["Ride cost"] ?? ""}
               </div>
             </div>
           </DialogContentText>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose} color="primary">
+        <DialogActions sx={{ padding: "16px 24px" }}>
+          <Button
+            onClick={onClose}
+            color="primary"
+            sx={{
+              padding: "8px 16px",
+              borderRadius: "8px",
+              textTransform: "none",
+              fontSize: "0.875rem",
+            }}
+          >
             Cancel
           </Button>
-          <Button onClick={handleAccept} color="primary" autoFocus>
+          <Button
+            onClick={handleAccept}
+            color="primary"
+            autoFocus
+            variant="contained"
+            sx={{
+              padding: "8px 16px",
+              borderRadius: "8px",
+              textTransform: "none",
+              fontSize: "0.875rem",
+              boxShadow: "none",
+              "&:hover": {
+                boxShadow: "none",
+                backgroundColor: "#1565c0",
+              },
+            }}
+          >
             Accept
           </Button>
         </DialogActions>
@@ -87,19 +145,22 @@ const RideDialog: React.FC<RideDialogProps> = ({ open, onClose, onAccept }) => {
       <Snackbar
         open={openSnackbar}
         autoHideDuration={3000}
-        onClose={handleSnackbarClose} // Fixed: Pass the function directly
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }} // Position at bottom-right
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
         <Alert
-          onClose={handleSnackbarClose} // Fixed: Pass the function directly
+          onClose={handleSnackbarClose}
           severity="success"
           sx={{
             width: "100%",
-            backgroundColor: "#2e7d32", // Dark green background
-            color: "#fff", // White text
+            backgroundColor: "#2e7d32",
+            color: "#fff",
             "& .MuiAlert-icon": {
-              color: "#fff", // White icon
+              color: "#fff",
             },
+            fontSize: "0.875rem",
+            padding: "12px 16px",
+            borderRadius: "8px",
           }}
         >
           Ride is accepted successfully!

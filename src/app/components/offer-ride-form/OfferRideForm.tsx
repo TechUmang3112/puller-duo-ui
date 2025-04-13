@@ -19,7 +19,7 @@ import ComboBoxAutocomplete from "../forms/form-elements/autoComplete/ComboBoxAu
 import { format, addDays } from "date-fns";
 import { enGB } from "date-fns/locale";
 import { UserState } from "@/store/user/UserReducer";
-import { useSelector } from "@/store/hooks";
+import { useDispatch, useSelector } from "@/store/hooks";
 import ChargesForRide from "./ChargesForRide";
 import {
   delayInMillis,
@@ -27,11 +27,14 @@ import {
   showSuccess,
 } from "@/services/utils.service";
 import { post } from "@/services/api.service";
-import { nDriver, nGoogle } from "@/constants/network";
+import { nDriver, nGoogle, nRider } from "@/constants/network";
 import { useEffect } from "react";
 import LoadingBtn from "../buttons/LoadingBtn";
+import { setAvailableRides } from "@/store/ride/RideReducer";
 
 const OfferRideForm = () => {
+  const dispatch = useDispatch();
+
   const [charges, setCharges] = React.useState<string>("");
   const [dateValue, setDateValue] = React.useState<Date | null>(null);
   const userState: UserState = useSelector((state) => state.userReducer);
@@ -55,13 +58,6 @@ const OfferRideForm = () => {
   const formattedDate = dateValue
     ? format(dateValue, "dd/MM/yyyy hh:mm a", { locale: enGB })
     : "";
-
-  // Function to validate date is in future and within one week
-  const shouldDisableDate = (date: Date) => {
-    const now = new Date();
-    const oneWeekLater = addDays(now, 7);
-    return date < now || date > oneWeekLater;
-  };
 
   async function measureDistance() {
     if (!latC || !latD) {
@@ -95,24 +91,42 @@ const OfferRideForm = () => {
       return;
     }
 
-    const body = {
-      userId: localStorage.getItem("userId"),
-      rideTime: dateValue.toJSON(),
-      totalPassengersAvailable: 1,
-      amountPerRider: +charges,
-      startPlace: startPlace,
-      endPlace: endPlace,
-      startLat: latC,
-      startLong: longC,
-      endLat: latD,
-      endLong: longD,
-    };
+    let response: any = {};
     setLoading(true);
 
-    const response = await post(nDriver.offerRide, body);
+    if (userState.type == "Driver") {
+      const body = {
+        userId: localStorage.getItem("userId"),
+        rideTime: dateValue.toJSON(),
+        totalPassengersAvailable: 1,
+        amountPerRider: +charges,
+        startPlace: startPlace,
+        endPlace: endPlace,
+        startLat: latC,
+        startLong: longC,
+        endLat: latD,
+        endLong: longD,
+      };
+
+      response = await post(nDriver.offerRide, body);
+    } else if (userState.type == "Rider") {
+      const body = {
+        userId: localStorage.getItem("userId"),
+        startPlace,
+        endPlace,
+        rideTime: dateValue.toJSON(),
+      };
+
+      response = await post(nRider.findRide, body);
+      if (response.list != null && response.list != undefined) {
+        dispatch(setAvailableRides(response.list));
+      }
+    }
+
     setLoading(false);
 
-    if (response.success == true) {
+    // Success for driver
+    if (response.success == true && userState.type == "Driver") {
       if (response.successMsg) {
         showSuccess(response.successMsg);
       }
@@ -285,7 +299,11 @@ const OfferRideForm = () => {
               ></LoadingBtn>
               {!isLoading && (
                 <Button
-                  disabled={latC == 0 || !dateValue || !charges}
+                  disabled={
+                    latC == 0 ||
+                    !dateValue ||
+                    (!charges && userState.type == "Driver")
+                  }
                   onClick={publishRide}
                   variant="contained"
                   color="primary"

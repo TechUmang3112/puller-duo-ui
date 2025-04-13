@@ -1,7 +1,7 @@
 "use client";
 
 // Imports
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   TableContainer,
   Table,
@@ -39,6 +39,8 @@ import {
 import { jsonDateToReadbaleFormat } from "@/services/date.service";
 import Disabled from "../ui-components/rating/Disabled";
 import RideDialog from "./RideAccept";
+import { RideState } from "@/store/ride/RideReducer";
+import { useSelector } from "@/store/hooks";
 
 interface PaginationDataType {
   Action?: boolean;
@@ -47,56 +49,24 @@ interface PaginationDataType {
   "Ending point": string;
   "Ride cost": number;
   Rating: number;
+  id?: string;
 }
-
-const tableData: PaginationDataType[] = [
-  {
-    Action: true,
-    Date: new Date().toJSON(),
-    "Starting point": "Sanand",
-    "Ending point": "Thaltej - Metro station",
-    "Ride cost": 500,
-    Rating: 2,
-  },
-  {
-    Action: true,
-    Date: new Date().toJSON(),
-    "Starting point": "Thaltej - Metro station",
-    "Ending point": "Vastral - Metro station",
-    "Ride cost": 900,
-    Rating: 5,
-  },
-  {
-    Action: true,
-    Date: new Date().toJSON(),
-    "Starting point": "Thaltej - Metro station",
-    "Ending point": "Gota",
-    "Ride cost": 900,
-    Rating: 4,
-  },
-];
-
-const basics = tableData;
 
 const columnHelper = createColumnHelper<PaginationDataType>();
 
-function getColumns(handleOpenDialog: () => void) {
+function getColumns(handleOpenDialog: (rideData: PaginationDataType) => void) {
   const columns = [
     columnHelper.accessor("Date", {
       header: () => "Date",
-      cell: (info: any) => {
-        console.log("info", info);
-
-        return (
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <Box>
-              <Typography variant="h6">
-                {jsonDateToReadbaleFormat(info.getValue())}
-              </Typography>
-            </Box>
-          </Stack>
-        );
-      },
+      cell: (info: any) => (
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <Box>
+            <Typography variant="h6">
+              {jsonDateToReadbaleFormat(info.getValue())}
+            </Typography>
+          </Box>
+        </Stack>
+      ),
     }),
 
     columnHelper.accessor("Starting point", {
@@ -152,7 +122,9 @@ function getColumns(handleOpenDialog: () => void) {
         filterVariant: "select",
       },
       cell: (info) => (
-        <Button onClick={handleOpenDialog}>Accept</Button> // Add onClick handler
+        <Button onClick={() => handleOpenDialog(info.row.original)}>
+          Accept
+        </Button>
       ),
     }),
   ];
@@ -162,8 +134,14 @@ function getColumns(handleOpenDialog: () => void) {
 
 const RideResults = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedRide, setSelectedRide] = useState<PaginationDataType | null>(
+    null
+  );
+  const rideState: RideState = useSelector((state) => state.rideReducer);
 
-  const handleOpenDialog = () => {
+  const handleOpenDialog = (rideData: PaginationDataType) => {
+    console.log("rideData", rideData);
+    setSelectedRide(rideData);
     setIsDialogOpen(true);
   };
 
@@ -173,14 +151,32 @@ const RideResults = () => {
 
   const handleAcceptRide = () => {
     setIsDialogOpen(false);
-    // You can add additional logic here if needed
   };
 
-  const [data, _setData] = React.useState(() => [...basics]);
+  const transformRidesToTableData = (rides: any[]): PaginationDataType[] => {
+    return rides.map((ride) => ({
+      id: ride.id,
+      Action: true,
+      Date: ride.createdAt || new Date().toJSON(),
+      "Starting point": ride.startPlace || "Unknown",
+      "Ending point": ride.endPlace || "Unknown",
+      "Ride cost": ride.total_payment || 0,
+      Rating: ride.rating || 0,
+    }));
+  };
+
+  const [data, setData] = React.useState<PaginationDataType[]>([]);
+
+  React.useEffect(() => {
+    if (rideState.availableRides) {
+      setData(transformRidesToTableData(rideState.availableRides));
+    }
+  }, [rideState.availableRides]);
+
   const [columnFilters, setColumnFilters] = React.useState<any>([]);
   const table = useReactTable({
     data,
-    columns: getColumns(handleOpenDialog), // Pass handleOpenDialog here
+    columns: getColumns(handleOpenDialog),
     filterFns: {},
     state: {
       columnFilters,
@@ -197,158 +193,175 @@ const RideResults = () => {
 
   return (
     <Box mt={5}>
-      <DownloadCard title="Available rides for Sanand">
+      <DownloadCard title="Available rides">
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Box>
-              <TableContainer>
-                <Table
-                  sx={{
-                    whiteSpace: "nowrap",
-                  }}
+              {data.length === 0 ? (
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  minHeight="200px"
                 >
-                  <TableHead>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                      <TableRow key={headerGroup.id}>
-                        {headerGroup.headers.map((header) => (
-                          <TableCell key={header.id}>
-                            <Typography
-                              variant="h6"
-                              mb={1}
-                              className={
-                                header.column.getCanSort()
-                                  ? "cursor-pointer select-none"
-                                  : ""
-                              }
-                              onClick={header.column.getToggleSortingHandler()}
-                            >
-                              {header.isPlaceholder
-                                ? null
-                                : flexRender(
-                                    header.column.columnDef.header,
-                                    header.getContext()
-                                  )}
-                              {(() => {
-                                const sortState = header.column.getIsSorted();
-                                if (sortState === "asc") return " 🔼";
-                                if (sortState === "desc") return " 🔽";
-                                return null;
-                              })()}
-                            </Typography>
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableHead>
-                  <TableBody>
-                    {table.getRowModel().rows.map((row) => (
-                      <TableRow key={row.id}>
-                        {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-              <Divider />
-              <Stack
-                gap={1}
-                p={3}
-                alignItems="center"
-                direction={{ xs: "column", sm: "row" }}
-                justifyContent="space-between"
-              >
-                <Box display="flex" alignItems="center" gap={1}>
-                  <Typography variant="body1">
-                    {table.getPrePaginationRowModel().rows.length} Rides
+                  <Typography variant="h6" color="textSecondary">
+                    No rides available currently
                   </Typography>
                 </Box>
-                <Box
-                  sx={{
-                    display: {
-                      xs: "block",
-                      sm: "flex",
-                    },
-                  }}
-                  alignItems="center"
-                  gap={1}
-                >
-                  <Stack direction="row" alignItems="center" gap={1}>
-                    <Typography variant="body1">Page</Typography>
-                    <Typography variant="body1" fontWeight={600}>
-                      {table.getState().pagination.pageIndex + 1} of{" "}
-                      {table.getPageCount()}
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" alignItems="center" gap={1}>
-                    | Go to page:
-                    <CustomTextField
-                      type="number"
-                      min="1"
-                      max={table.getPageCount()}
-                      defaultValue={table.getState().pagination.pageIndex + 1}
-                      onChange={(e: { target: { value: any } }) => {
-                        const page = e.target.value
-                          ? Number(e.target.value) - 1
-                          : 0;
-                        table.setPageIndex(page);
+              ) : (
+                <>
+                  <TableContainer>
+                    <Table sx={{ whiteSpace: "nowrap" }}>
+                      <TableHead>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                          <TableRow key={headerGroup.id}>
+                            {headerGroup.headers.map((header) => (
+                              <TableCell key={header.id}>
+                                <Typography
+                                  variant="h6"
+                                  mb={1}
+                                  className={
+                                    header.column.getCanSort()
+                                      ? "cursor-pointer select-none"
+                                      : ""
+                                  }
+                                  onClick={header.column.getToggleSortingHandler()}
+                                >
+                                  {header.isPlaceholder
+                                    ? null
+                                    : flexRender(
+                                        header.column.columnDef.header,
+                                        header.getContext()
+                                      )}
+                                  {(() => {
+                                    const sortState =
+                                      header.column.getIsSorted();
+                                    if (sortState === "asc") return " 🔼";
+                                    if (sortState === "desc") return " 🔽";
+                                    return null;
+                                  })()}
+                                </Typography>
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        ))}
+                      </TableHead>
+                      <TableBody>
+                        {table.getRowModel().rows.map((row) => (
+                          <TableRow key={row.id}>
+                            {row.getVisibleCells().map((cell) => (
+                              <TableCell key={cell.id}>
+                                {flexRender(
+                                  cell.column.columnDef.cell,
+                                  cell.getContext()
+                                )}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                  <Divider />
+                  <Stack
+                    gap={1}
+                    p={3}
+                    alignItems="center"
+                    direction={{ xs: "column", sm: "row" }}
+                    justifyContent="space-between"
+                  >
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Typography variant="body1">
+                        {table.getPrePaginationRowModel().rows.length} Rides
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: {
+                          xs: "block",
+                          sm: "flex",
+                        },
                       }}
-                    />
-                  </Stack>
-                  <CustomSelect
-                    value={table.getState().pagination.pageSize}
-                    onChange={(e: { target: { value: any } }) => {
-                      table.setPageSize(Number(e.target.value));
-                    }}
-                  >
-                    {[5, 10, 15, 20, 25].map((pageSize) => (
-                      <MenuItem key={pageSize} value={pageSize}>
-                        {pageSize}
-                      </MenuItem>
-                    ))}
-                  </CustomSelect>
+                      alignItems="center"
+                      gap={1}
+                    >
+                      <Stack direction="row" alignItems="center" gap={1}>
+                        <Typography variant="body1">Page</Typography>
+                        <Typography variant="body1" fontWeight={600}>
+                          {table.getState().pagination.pageIndex + 1} of{" "}
+                          {table.getPageCount()}
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" alignItems="center" gap={1}>
+                        | Go to page:
+                        <CustomTextField
+                          type="number"
+                          min="1"
+                          max={table.getPageCount()}
+                          defaultValue={
+                            table.getState().pagination.pageIndex + 1
+                          }
+                          onChange={(e: { target: { value: any } }) => {
+                            const page = e.target.value
+                              ? Number(e.target.value) - 1
+                              : 0;
+                            table.setPageIndex(page);
+                          }}
+                        />
+                      </Stack>
+                      <CustomSelect
+                        value={table.getState().pagination.pageSize}
+                        onChange={(e: { target: { value: any } }) => {
+                          table.setPageSize(Number(e.target.value));
+                        }}
+                      >
+                        {[5, 10, 15, 20, 25].map((pageSize) => (
+                          <MenuItem key={pageSize} value={pageSize}>
+                            {pageSize}
+                          </MenuItem>
+                        ))}
+                      </CustomSelect>
 
-                  <IconButton
-                    size="small"
-                    onClick={() => table.setPageIndex(0)}
-                    disabled={!table.getCanPreviousPage()}
-                  >
-                    <IconChevronsLeft />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                  >
-                    <IconChevronLeft />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                  >
-                    <IconChevronRight />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                    disabled={!table.getCanNextPage()}
-                  >
-                    <IconChevronsRight />
-                  </IconButton>
-                </Box>
-                <RideDialog
-                  open={isDialogOpen}
-                  onClose={handleCloseDialog}
-                  onAccept={handleAcceptRide}
-                />
-              </Stack>
+                      <IconButton
+                        size="small"
+                        onClick={() => table.setPageIndex(0)}
+                        disabled={!table.getCanPreviousPage()}
+                      >
+                        <IconChevronsLeft />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => table.previousPage()}
+                        disabled={!table.getCanPreviousPage()}
+                      >
+                        <IconChevronLeft />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => table.nextPage()}
+                        disabled={!table.getCanNextPage()}
+                      >
+                        <IconChevronRight />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() =>
+                          table.setPageIndex(table.getPageCount() - 1)
+                        }
+                        disabled={!table.getCanNextPage()}
+                      >
+                        <IconChevronsRight />
+                      </IconButton>
+                    </Box>
+                  </Stack>
+                </>
+              )}
+              <RideDialog
+                open={isDialogOpen}
+                onClose={handleCloseDialog}
+                onAccept={handleAcceptRide}
+                rideData={selectedRide}
+              />
             </Box>
           </Grid>
         </Grid>

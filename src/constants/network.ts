@@ -25,6 +25,10 @@ export const nDriver = {
   offerRide: baseUrl + "driver/offerRide",
 };
 
+export const nRider = {
+  findRide: baseUrl + "rider/findRide",
+};
+
 export const nGoogle = {
   searchPlaces: baseUrl + "thirdParty/google/searchPlaces",
   measureDistance: baseUrl + "thirdParty/google/measureDistance",

@@ -1,6 +1,5 @@
 // Imports
 import { createSlice } from "@reduxjs/toolkit";
-import { NumberLocale } from "yup/lib/locale";
 
 export type RideState = {
   count: {
@@ -9,9 +8,11 @@ export type RideState = {
     current: number;
     completed: number;
   };
+  availableRides: any[];
 };
 
 const initialState = {
+  availableRides: [],
   count: { total: 0, upcoming: 0, current: 0, completed: 0 },
 } as RideState;
 
@@ -22,9 +23,12 @@ export const rideReducer = createSlice({
     setCount: (state, action) => {
       state.count = action.payload;
     },
+    setAvailableRides: (state, action) => {
+      state.availableRides = action.payload;
+    },
   },
 });
 
-export const { setCount } = rideReducer.actions;
+export const { setCount, setAvailableRides } = rideReducer.actions;
 
 export default rideReducer.reducer;

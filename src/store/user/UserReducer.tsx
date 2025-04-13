@@ -9,7 +9,7 @@ export type UserState = {
   isAuthLoading: boolean;
   isDocVerificationPending: boolean;
   otpType: "Email" | "Forgot";
-  type: "Admin" | "Not decided" | "Driver" | "Rider";
+  type: "Admin" | "Not decided" | "Driver" | "Rider" | "User";
 };
 
 const initialState = {

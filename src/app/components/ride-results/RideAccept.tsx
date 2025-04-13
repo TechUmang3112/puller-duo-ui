@@ -1,20 +1,16 @@
 // Imports
-import React from "react";
+import React, { useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import { Button } from "@mui/material";
-
-const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
-  props,
-  ref
-) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+import { RideState } from "@/store/ride/RideReducer";
+import { useSelector } from "@/store/hooks";
+import { post } from "@/services/api.service";
+import { nRider } from "@/constants/network";
+import { showSuccess } from "@/services/utils.service";
 
 interface RideDialogProps {
   open: boolean;
@@ -29,23 +25,24 @@ const RideDialog: React.FC<RideDialogProps> = ({
   onClose,
   onAccept,
 }) => {
-  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const rideState: RideState = useSelector((state) => state.rideReducer);
 
   const handleAccept = () => {
-    onAccept(); // Call the onAccept handler from props
-    setOpenSnackbar(true);
-    window.location.href = "/user/myRides";
+    acceptRide();
   };
 
-  const handleSnackbarClose = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") {
-      return;
+  async function acceptRide() {
+    const rideId = rideState.availableRides[rideData.rowIndex]._id;
+
+    const body = { userId: localStorage.getItem("userId"), rideId };
+    const response = await post(nRider.acceptRide, body);
+    if (response.success == true) {
+      onAccept();
+
+      showSuccess(response.successMsg);
+      window.location.replace("/user/upcomingRides");
     }
-    setOpenSnackbar(false);
-  };
+  }
 
   return (
     <>
@@ -120,6 +117,7 @@ const RideDialog: React.FC<RideDialogProps> = ({
           >
             Cancel
           </Button>
+
           <Button
             onClick={handleAccept}
             color="primary"
@@ -141,31 +139,6 @@ const RideDialog: React.FC<RideDialogProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
-
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity="success"
-          sx={{
-            width: "100%",
-            backgroundColor: "#2e7d32",
-            color: "#fff",
-            "& .MuiAlert-icon": {
-              color: "#fff",
-            },
-            fontSize: "0.875rem",
-            padding: "12px 16px",
-            borderRadius: "8px",
-          }}
-        >
-          Ride is accepted successfully!
-        </Alert>
-      </Snackbar>
     </>
   );
 };

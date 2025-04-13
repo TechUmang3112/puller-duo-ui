@@ -36,20 +36,22 @@ import {
   IconChevronsLeft,
   IconChevronsRight,
 } from "@tabler/icons-react";
-import { jsonDateToReadbaleFormat } from "@/services/date.service";
 import Disabled from "../ui-components/rating/Disabled";
 import RideDialog from "./RideAccept";
 import { RideState } from "@/store/ride/RideReducer";
 import { useSelector } from "@/store/hooks";
+import { getFormattedDateAndTime } from "@/services/date.service";
 
 interface PaginationDataType {
   Action?: boolean;
   Date?: string;
+  Time?: string;
   "Starting point": string;
   "Ending point": string;
   "Ride cost": number;
   Rating: number;
   id?: string;
+  rowIndex?: number; // New field
 }
 
 const columnHelper = createColumnHelper<PaginationDataType>();
@@ -61,9 +63,18 @@ function getColumns(handleOpenDialog: (rideData: PaginationDataType) => void) {
       cell: (info: any) => (
         <Stack direction="row" alignItems="center" spacing={2}>
           <Box>
-            <Typography variant="h6">
-              {jsonDateToReadbaleFormat(info.getValue())}
-            </Typography>
+            <Typography variant="h6">{info.getValue()}</Typography>
+          </Box>
+        </Stack>
+      ),
+    }),
+
+    columnHelper.accessor("Time", {
+      header: () => "Time",
+      cell: (info: any) => (
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <Box>
+            <Typography variant="h6">{info.getValue()}</Typography>
           </Box>
         </Stack>
       ),
@@ -118,9 +129,6 @@ function getColumns(handleOpenDialog: (rideData: PaginationDataType) => void) {
 
     columnHelper.accessor("Action", {
       header: () => "Action",
-      meta: {
-        filterVariant: "select",
-      },
       cell: (info) => (
         <Button onClick={() => handleOpenDialog(info.row.original)}>
           Accept
@@ -140,8 +148,7 @@ const RideResults = () => {
   const rideState: RideState = useSelector((state) => state.rideReducer);
 
   const handleOpenDialog = (rideData: PaginationDataType) => {
-    console.log("rideData", rideData);
-    setSelectedRide(rideData);
+    setSelectedRide(rideData); // rideData already contains rowIndex
     setIsDialogOpen(true);
   };
 
@@ -154,14 +161,16 @@ const RideResults = () => {
   };
 
   const transformRidesToTableData = (rides: any[]): PaginationDataType[] => {
-    return rides.map((ride) => ({
+    return rides.map((ride, index) => ({
       id: ride.id,
       Action: true,
-      Date: ride.createdAt || new Date().toJSON(),
+      Date: getFormattedDateAndTime(new Date(ride.rideTime)).Date,
+      Time: getFormattedDateAndTime(new Date(ride.rideTime)).Time,
       "Starting point": ride.startPlace || "Unknown",
       "Ending point": ride.endPlace || "Unknown",
       "Ride cost": ride.total_payment || 0,
       Rating: ride.rating || 0,
+      rowIndex: index, // Add the row index to the ride data
     }));
   };
 

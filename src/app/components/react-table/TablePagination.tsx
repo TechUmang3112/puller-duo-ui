@@ -198,7 +198,12 @@ const TablePagination = () => {
           "Ending point": ride.endPlace || "Unknown",
           "Ride cost": ride.total_payment || 0,
           Rating: ride.rating || undefined,
-          status: ride.status == "-1" ? "pending" : "pending",
+          status:
+            ride.status == "-1"
+              ? "pending"
+              : ride.status == "-2"
+              ? "Accepted"
+              : "pending",
         }));
 
         setData(formattedData);

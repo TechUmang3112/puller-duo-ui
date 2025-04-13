@@ -27,6 +27,7 @@ export const nDriver = {
 
 export const nRider = {
   findRide: baseUrl + "rider/findRide",
+  acceptRide: baseUrl + "rider/acceptRide",
 };
 
 export const nGoogle = {

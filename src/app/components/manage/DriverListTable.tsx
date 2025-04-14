@@ -1,7 +1,7 @@
 "use client";
 
 // Imports
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   TableContainer,
   Table,
@@ -37,38 +37,22 @@ import {
   IconChevronsRight,
 } from "@tabler/icons-react";
 import Disabled from "../ui-components/rating/Disabled";
+import { nAdmin } from "@/constants/network";
+import { get } from "@/services/api.service";
 
 export interface PaginationDataType {
-  Name: string;
-  Email: string;
-  "Total Rides": number;
-  Rating: number;
-  DocumentStatus: string;
+  id: string;
+  name: string;
+  email: string;
+  totalRides: number;
+  rating: number;
+  documentStatus: string;
 }
-
-export const basicsTableData: PaginationDataType[] = [
-  {
-    Name: "Rahil Patel",
-    Email: "rahil.driver@gmail.com",
-    "Total Rides": 12,
-    Rating: 4,
-    DocumentStatus: "Approved",
-  },
-  {
-    Name: "Dhruv Patel",
-    Email: "dhruv.driver@gmail.com",
-    "Total Rides": 0,
-    Rating: 0,
-    DocumentStatus: "Rejected",
-  },
-];
-
-const basics = basicsTableData;
 
 const columnHelper = createColumnHelper<PaginationDataType>();
 
 const columns = [
-  columnHelper.accessor("Name", {
+  columnHelper.accessor("name", {
     header: () => "Name",
     cell: (info) => (
       <Typography variant="subtitle1" color="textSecondary">
@@ -77,7 +61,7 @@ const columns = [
     ),
   }),
 
-  columnHelper.accessor("Email", {
+  columnHelper.accessor("email", {
     header: () => "Email",
     cell: (info) => (
       <Typography variant="subtitle1" color="textSecondary">
@@ -86,7 +70,7 @@ const columns = [
     ),
   }),
 
-  columnHelper.accessor("Total Rides", {
+  columnHelper.accessor("totalRides", {
     header: () => "Total Rides",
     cell: (info) => (
       <Typography variant="subtitle1" color="textSecondary">
@@ -95,7 +79,7 @@ const columns = [
     ),
   }),
 
-  columnHelper.accessor("Rating", {
+  columnHelper.accessor("rating", {
     header: () => "Rating",
     cell: (info) => {
       if (info.getValue()) {
@@ -108,7 +92,7 @@ const columns = [
     },
   }),
 
-  columnHelper.accessor("DocumentStatus", {
+  columnHelper.accessor("documentStatus", {
     header: () => "Document Status",
     meta: {
       filterVariant: "select",
@@ -145,8 +129,11 @@ const columns = [
 ];
 
 const DriverListTable = () => {
-  const [data, _setData] = React.useState(() => [...basics]);
+  const [data, setData] = useState<PaginationDataType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [columnFilters, setColumnFilters] = React.useState<any>([]);
+
   const table = useReactTable({
     data,
     columns,
@@ -156,13 +143,75 @@ const DriverListTable = () => {
     },
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(), //client side filtering
+    getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     debugTable: true,
     debugHeaders: true,
     debugColumns: false,
   });
+
+  useEffect(() => {
+    getDrivers();
+  }, []);
+
+  async function getDrivers() {
+    try {
+      setLoading(true);
+      const response = await get(nAdmin.drivers);
+      if (response.list && Array.isArray(response.list)) {
+        // Transform the API data to match our table structure
+        const formattedData = response.list.map((driver: any) => ({
+          id: driver.id || "",
+          name: driver.name || "N/A",
+          email: driver.email || "N/A",
+          totalRides: driver.totalRides || 0,
+          rating: driver.rating || 0,
+          documentStatus: driver.isDriverLicenceApproved
+            ? "Approved"
+            : "Not uploaded",
+        }));
+        setData(formattedData);
+      } else {
+        setData([]);
+      }
+    } catch (err) {
+      setError("Failed to fetch drivers. Please try again later.");
+      console.error("Error fetching drivers:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <DownloadCard title="Drivers">
+        <Typography variant="body1" p={3}>
+          Loading drivers...
+        </Typography>
+      </DownloadCard>
+    );
+  }
+
+  if (error) {
+    return (
+      <DownloadCard title="Drivers">
+        <Typography variant="body1" color="error" p={3}>
+          {error}
+        </Typography>
+      </DownloadCard>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <DownloadCard title="Drivers">
+        <Typography variant="body1" p={3}>
+          No drivers found.
+        </Typography>
+      </DownloadCard>
+    );
+  }
 
   return (
     <DownloadCard title="Drivers">

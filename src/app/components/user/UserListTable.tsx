@@ -43,7 +43,8 @@ import {
   IconChevronsRight,
 } from "@tabler/icons-react";
 import { nAdmin } from "@/constants/network";
-import { get } from "@/services/api.service";
+import { get, post } from "@/services/api.service";
+import { showSuccess } from "@/services/utils.service";
 
 export interface PaginationDataType {
   id: string;
@@ -97,12 +98,26 @@ const UserListTable = () => {
     handleDialogClose();
   };
 
-  const handleToggleActive = (id: string) => {
-    setData((prevData) =>
-      prevData.map((item) =>
-        item.id === id ? { ...item, isActive: !item.isActive } : item
-      )
-    );
+  const handleToggleActive = async (id: string, currentStatus: boolean) => {
+    try {
+      // Optimistically update the UI
+      setData((prevData) =>
+        prevData.map((item) =>
+          item.id === id ? { ...item, isActive: !currentStatus } : item
+        )
+      );
+
+      // Call the API to update the status
+      await updateUserStatus(!currentStatus, id);
+    } catch (error) {
+      // If there's an error, revert the UI change
+      setData((prevData) =>
+        prevData.map((item) =>
+          item.id === id ? { ...item, isActive: currentStatus } : item
+        )
+      );
+      // You might want to show an error message here
+    }
   };
 
   const columns = [
@@ -178,7 +193,9 @@ const UserListTable = () => {
       cell: (info) => (
         <Switch
           checked={info.getValue()}
-          onChange={() => handleToggleActive(info.row.original.id)}
+          onChange={() =>
+            handleToggleActive(info.row.original.id, info.getValue())
+          }
           color="primary"
         />
       ),
@@ -215,10 +232,17 @@ const UserListTable = () => {
           user.isAadhaarApproved || user.isDriverLicenceApproved
             ? "Approved"
             : "Not uploaded",
-        isActive: user.isActive || false,
+        isActive: user.isActive ?? true,
       }));
       setData(mappedData);
       setLoading(false);
+    }
+  }
+
+  async function updateUserStatus(isActive: boolean, userId: string) {
+    const response = await post(nAdmin.updateUserStatus, { userId, isActive });
+    if (response.success) {
+      showSuccess(response.successMsg);
     }
   }
 

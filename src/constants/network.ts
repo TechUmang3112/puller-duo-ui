@@ -23,6 +23,8 @@ export const nUser = {
 
 export const nDriver = {
   offerRide: baseUrl + "driver/offerRide",
+  cancelRide: baseUrl + "driver/cancelRide",
+  startRide: baseUrl + "driver/startRide",
 };
 
 export const nRider = {

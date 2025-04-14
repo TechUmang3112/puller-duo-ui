@@ -203,6 +203,10 @@ const TablePagination = () => {
               ? "pending"
               : ride.status == "-2"
               ? "Accepted"
+              : ride.status == "3"
+              ? "cancel"
+              : ride.status == "0"
+              ? "started"
               : "pending",
         }));
 

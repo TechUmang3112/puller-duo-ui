@@ -59,8 +59,6 @@ const Header = () => {
 
         <Box flexGrow={1} />
         <Stack spacing={1} direction="row" alignItems="center">
-          {localStorage.getItem("user_type") != "2" && <Notifications />}
-
           {lgDown ? <MobileRightSidebar /> : null}
           <Profile />
         </Stack>

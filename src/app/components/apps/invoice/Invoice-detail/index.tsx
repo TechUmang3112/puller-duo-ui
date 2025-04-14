@@ -25,8 +25,8 @@ import Link from "next/link";
 import Logo from "@/app/(DashboardLayout)/layout/shared/logo/Logo";
 import { useSelector } from "@/store/hooks";
 import { AppState } from "@/store/store";
-import { get } from "@/services/api.service";
-import { nUser } from "@/constants/network";
+import { get, post } from "@/services/api.service";
+import { nRider, nUser } from "@/constants/network";
 
 const InvoiceDetail = () => {
   const [rideData, setRideData] = useState<any>({ isPending: true });
@@ -50,6 +50,15 @@ const InvoiceDetail = () => {
     setRideData(rideData);
   }
 
+  async function initiatePayment() {
+    const response = await post(nRider.initiatePayment, {
+      userId: localStorage.getItem("userId"),
+    });
+    if (response.url) {
+      window.location.replace(response.url);
+    }
+  }
+
   // Get the last part of the URL path as the billFrom parameter
   const pathName = usePathname();
   const getTitle = pathName.split("/").pop();
@@ -69,12 +78,6 @@ const InvoiceDetail = () => {
   if (!selectedInvoice) {
     return <div>Loading...</div>;
   }
-
-  const orderDate = selectedInvoice.orderDate
-    ? isValid(parseISO(selectedInvoice.orderDate))
-      ? format(parseISO(selectedInvoice.orderDate), "EEEE, MMMM dd, yyyy")
-      : "Invalid Date"
-    : format(new Date(), "EEEE, MMMM dd, yyyy");
 
   if (rideData.isPending) {
     return <div>Loading...</div>;
@@ -249,17 +252,10 @@ const InvoiceDetail = () => {
         >
           <Button
             variant="contained"
-            color="secondary"
-            component={Link}
-            href={`/apps/invoice/edit/${selectedInvoice.billFrom}`}
-          >
-            Cancel payment
-          </Button>
-          <Button
-            variant="contained"
             color="primary"
-            component={Link}
-            href="/apps/invoice/list"
+            onClick={() => {
+              initiatePayment();
+            }}
           >
             Pay now
           </Button>

@@ -97,7 +97,9 @@ function RideInsights() {
           <Box
             bgcolor="secondary.light"
             p={3}
-            onClick={() => {}}
+            onClick={() => {
+              window.location.href = "/user/currentRide";
+            }}
             sx={{ cursor: "pointer" }}
           >
             <Stack direction="row" gap={2} alignItems="center">

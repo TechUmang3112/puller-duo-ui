@@ -31,6 +31,7 @@ export const nDriver = {
 export const nRider = {
   findRide: baseUrl + "rider/findRide",
   acceptRide: baseUrl + "rider/acceptRide",
+  initiatePayment: baseUrl + "rider/initiatePayment",
 };
 
 export const nGoogle = {

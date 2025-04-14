@@ -174,6 +174,8 @@ const TotalRideListTable = () => {
               ? "Accepted"
               : ride.status == "3"
               ? "Cancelled"
+              : ride.status == "0"
+              ? "Started"
               : "Unknown",
         }));
         setData(formattedData);

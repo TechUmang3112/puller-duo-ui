@@ -1,5 +1,6 @@
 "use client";
 
+// Imports
 import * as React from "react";
 import {
   Typography,
@@ -15,20 +16,20 @@ import {
 } from "@mui/material";
 import BlankCard from "@/app/components/shared/BlankCard";
 import ParentCard from "@/app/components/shared/ParentCard";
-import { SAMPLE_BASE_64 } from "@/constants/strings";
+import { nAdmin } from "@/constants/network";
+import { get, post } from "@/services/api.service";
+import { showSuccess } from "@/services/utils.service";
 
-const sampleBase64Image = "data:image/png;base64," + SAMPLE_BASE_64;
-
-function createData(pname?: string, type?: "Driver" | "Rider", image?: string) {
-  return {
-    pname,
-    type,
-    image: image || sampleBase64Image,
-  };
+// Define types for your data
+interface ApprovalItem {
+  id: string; // Added id field for API operations
+  pname?: string;
+  type?: "Driver" | "Rider";
+  image?: string;
 }
 
-function Row(props: { row: ReturnType<typeof createData> }) {
-  const { row } = props;
+function Row(props: { row: ApprovalItem; onActionComplete: () => void }) {
+  const { row, onActionComplete } = props;
 
   const handleImageClick = () => {
     if (row.image) {
@@ -80,8 +81,23 @@ function Row(props: { row: ReturnType<typeof createData> }) {
     }
   };
 
-  const handleApprove = () => console.log("Approved:", row.pname);
-  const handleDecline = () => console.log("Declined:", row.pname);
+  const handleApprove = async () => {
+    try {
+      await updateDocStatus(row.id, "approve");
+      onActionComplete();
+    } catch (error) {
+      console.error("Failed to approve:", error);
+    }
+  };
+
+  const handleDecline = async () => {
+    try {
+      await updateDocStatus(row.id, "decline");
+      onActionComplete();
+    } catch (error) {
+      console.error("Failed to decline:", error);
+    }
+  };
 
   return (
     <TableRow sx={{ "& .MuiTableCell-root": { verticalAlign: "middle" } }}>
@@ -146,35 +162,104 @@ function Row(props: { row: ReturnType<typeof createData> }) {
   );
 }
 
-const rows = [
-  createData("John Doe", "Driver"),
-  createData("Jane Smith", "Rider"),
-  createData("Mike Johnson", "Driver"),
-  createData("Sarah Williams", "Rider"),
-];
+const TableCollapsible = () => {
+  const [approvalList, setApprovalList] = React.useState<ApprovalItem[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
-const TableCollapsible = () => (
-  <ParentCard title="Pending Approvals (19)">
-    <BlankCard>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Type</TableCell>
-              <TableCell>Image</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => (
-              <Row key={row.pname} row={row} />
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </BlankCard>
-  </ParentCard>
-);
+  React.useEffect(() => {
+    getApprovalList();
+  }, []);
+
+  async function getApprovalList() {
+    try {
+      setLoading(true);
+      const response = await get(nAdmin.approvalList);
+
+      if (response.list) {
+        // Transform the API response into the format your component expects
+        const transformedData = response.list.map((item: any) => ({
+          id: item._id, // Make sure to include the id from the API response
+          pname: item.name || item.username || item.email,
+          type: item.type === "1" ? "Driver" : "Rider",
+          image: "data:image/png;base64," + item.base64Content,
+        }));
+
+        setApprovalList(transformedData);
+      } else {
+        setApprovalList([]);
+      }
+    } catch (err) {
+      setError("Failed to fetch approval list");
+      console.error("Error fetching approval list:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleActionComplete = () => {
+    // Refresh the table data after any action
+    getApprovalList();
+  };
+
+  // Get the count of pending approvals for the title
+  const pendingCount = approvalList.length;
+
+  if (loading) {
+    return <Typography>Loading...</Typography>;
+  }
+
+  if (error) {
+    return <Typography color="error">{error}</Typography>;
+  }
+
+  return (
+    <ParentCard title={`Pending Approvals (${pendingCount})`}>
+      <BlankCard>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Type</TableCell>
+                <TableCell>Image</TableCell>
+                <TableCell>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {approvalList.length > 0 ? (
+                approvalList.map((row, index) => (
+                  <Row
+                    key={`${row.id}-${index}`}
+                    row={row}
+                    onActionComplete={handleActionComplete}
+                  />
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={4} align="center">
+                    <Typography variant="body1" color="textSecondary">
+                      No pending approvals
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </BlankCard>
+    </ParentCard>
+  );
+};
+
+async function updateDocStatus(userId: string, action: "approve" | "decline") {
+  const response = await post(nAdmin.updateDocStatus, {
+    userId,
+    action: action === "approve" ? "approve" : "rejected",
+  });
+  if (response?.success) {
+    showSuccess(response.successMsg);
+  }
+}
 
 export default TableCollapsible;

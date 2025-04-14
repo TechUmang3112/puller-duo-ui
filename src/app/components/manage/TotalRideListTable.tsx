@@ -1,7 +1,7 @@
 "use client";
 
 // Imports
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   TableContainer,
   Table,
@@ -36,53 +36,40 @@ import {
   IconChevronsLeft,
   IconChevronsRight,
 } from "@tabler/icons-react";
-import Disabled from "../ui-components/rating/Disabled";
+import { nAdmin } from "@/constants/network";
+import { get } from "@/services/api.service";
+import { getFormattedDateAndTime } from "@/services/date.service";
 
 export interface PaginationDataType {
   "Start Point": string;
   "End Point": string;
   Cost: number;
   Status: string;
+  Date: string;
+  Time?: string;
 }
-
-export const basicsTableData: PaginationDataType[] = [
-  {
-    "Start Point": "Sanand",
-    "End Point": "Thaltej",
-    Cost: 245,
-    Status: "Offered",
-  },
-  {
-    "Start Point": "Sanand",
-    "End Point": "Thaltej",
-    Cost: 245,
-    Status: "Accepted",
-  },
-  {
-    "Start Point": "Sanand",
-    "End Point": "Thaltej",
-    Cost: 245,
-    Status: "Completed",
-  },
-  {
-    "Start Point": "Sanand",
-    "End Point": "Thaltej",
-    Cost: 245,
-    Status: "Started",
-  },
-  {
-    "Start Point": "Sanand",
-    "End Point": "Thaltej",
-    Cost: 245,
-    Status: "Cancelled",
-  },
-];
-
-const basics = basicsTableData;
 
 const columnHelper = createColumnHelper<PaginationDataType>();
 
 const columns = [
+  columnHelper.accessor("Date", {
+    header: () => "Date",
+    cell: (info) => (
+      <Typography variant="subtitle1" color="textSecondary">
+        {info.getValue()}
+      </Typography>
+    ),
+  }),
+
+  columnHelper.accessor("Time", {
+    header: () => "Time",
+    cell: (info) => (
+      <Typography variant="subtitle1" color="textSecondary">
+        {info.getValue()}
+      </Typography>
+    ),
+  }),
+
   columnHelper.accessor("Start Point", {
     header: () => "Start Point",
     cell: (info) => (
@@ -102,7 +89,7 @@ const columns = [
   }),
 
   columnHelper.accessor("Cost", {
-    header: () => "Total Rides",
+    header: () => "Cost",
     cell: (info) => (
       <Typography variant="subtitle1" color="textSecondary">
         ₹{info.getValue()}
@@ -143,8 +130,10 @@ const columns = [
 ];
 
 const TotalRideListTable = () => {
-  const [data, _setData] = React.useState(() => [...basics]);
+  const [data, setData] = useState<PaginationDataType[]>([]);
+  const [loading, setLoading] = useState(true);
   const [columnFilters, setColumnFilters] = React.useState<any>([]);
+
   const table = useReactTable({
     data,
     columns,
@@ -154,13 +143,65 @@ const TotalRideListTable = () => {
     },
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(), //client side filtering
+    getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     debugTable: true,
     debugHeaders: true,
     debugColumns: false,
   });
+
+  useEffect(() => {
+    getTotalRides();
+  }, []);
+
+  async function getTotalRides() {
+    try {
+      setLoading(true);
+      const response = await get(nAdmin.totalRides);
+      if (response.list && Array.isArray(response.list)) {
+        // Transform the API response to match the expected data structure
+        const formattedData = response.list.map((ride: any) => ({
+          Date: getFormattedDateAndTime(new Date(ride.rideTime)).Date,
+          Time: getFormattedDateAndTime(new Date(ride.rideTime)).Time,
+          "Start Point": ride.startPlace || "N/A",
+          "End Point": ride.endPlace || "N/A",
+          Cost: ride.total_payment || 0,
+          Status:
+            ride.status == "-1"
+              ? "Offered"
+              : ride.status == "-2"
+              ? "Accepted"
+              : "Unknown",
+        }));
+        setData(formattedData);
+      }
+    } catch (error) {
+      console.error("Error fetching rides:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <DownloadCard title="Rides">
+        <Typography variant="body1" p={3}>
+          Loading rides...
+        </Typography>
+      </DownloadCard>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <DownloadCard title="Rides">
+        <Typography variant="body1" p={3}>
+          No rides found
+        </Typography>
+      </DownloadCard>
+    );
+  }
 
   return (
     <DownloadCard title="Rides">

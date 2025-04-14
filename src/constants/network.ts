@@ -40,4 +40,7 @@ export const nAdmin = {
   drivers: baseUrl + "admin/drivers",
   riders: baseUrl + "admin/riders",
   updateUserStatus: baseUrl + "admin/updateUserStatus",
+  approvalList: baseUrl + "admin/pendingApprovals",
+  updateDocStatus: baseUrl + "admin/updateDocStatus",
+  totalRides: baseUrl + "admin/totalRides",
 };

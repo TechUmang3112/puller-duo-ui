@@ -43,4 +43,7 @@ export const nAdmin = {
   approvalList: baseUrl + "admin/pendingApprovals",
   updateDocStatus: baseUrl + "admin/updateDocStatus",
   totalRides: baseUrl + "admin/totalRides",
+  monthlyUsers: baseUrl + "admin/monthlyUsers",
+  yearlyUsers: baseUrl + "admin/yearlyUsers",
+  monthlyComparision: baseUrl + "admin/monthlyComparison",
 };

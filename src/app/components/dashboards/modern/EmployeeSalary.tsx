@@ -92,12 +92,12 @@ const EmployeeSalary = ({ isLoading }: EmployeeSalaryCardProps) => {
           dataItem2="70"
         >
           <>
-            <Box height="295px">
+            <Box height="400px">
               <Chart
                 options={optionscolumnchart}
                 series={seriescolumnchart}
                 type="bar"
-                height={280}
+                height={310}
                 width={"100%"}
               />
             </Box>

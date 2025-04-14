@@ -11,12 +11,11 @@ import RideResults from "../components/ride-results/RideResults";
 import RideInsights from "../components/ride-results/RideInsights";
 import PageContainer from "@/app/components/container/PageContainer";
 import OfferRideForm from "../components/offer-ride-form/OfferRideForm";
-import RevenueUpdates from "../components/dashboards/modern/RevenueUpdates";
 import YearlyBreakup from "../components/dashboards/modern/YearlyBreakup";
 import MonthlyEarnings from "../components/dashboards/modern/MonthlyEarnings";
 import EmployeeSalary from "../components/dashboards/modern/EmployeeSalary";
-import TopPerformers from "../components/dashboards/modern/TopPerformers";
 import BannerCard from "../components/widgets/cards/BannerCard";
+import UserInsights from "../components/manage/UserInsights";
 
 const BCrumb = [
   {
@@ -49,6 +48,8 @@ export default function Dashboard() {
           <Breadcrumb title="Profile under verification" items={BCrumb} />
         )}
 
+        {userState.type == "Admin" && <UserInsights />}
+
         {userState.type != "Admin" && userState.type != "Not decided" && (
           <RideInsights />
         )}
@@ -73,7 +74,7 @@ export default function Dashboard() {
           <Grid container spacing={3}>
             {/* column */}
             <Grid item xs={12} lg={8}>
-              <RevenueUpdates isLoading={isLoading} />
+              <EmployeeSalary isLoading={isLoading} />
             </Grid>
             {/* column */}
             <Grid item xs={12} lg={4}>
@@ -85,15 +86,6 @@ export default function Dashboard() {
                   <MonthlyEarnings isLoading={isLoading} />
                 </Grid>
               </Grid>
-            </Grid>
-
-            {/* column */}
-            <Grid item xs={12} lg={4}>
-              <EmployeeSalary isLoading={isLoading} />
-            </Grid>
-            {/* column */}
-            <Grid item xs={12} lg={8}>
-              <TopPerformers />
             </Grid>
           </Grid>
         )}

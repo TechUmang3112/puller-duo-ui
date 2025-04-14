@@ -139,8 +139,8 @@ const InvoiceDetail = () => {
               <Typography variant="h6" mb={2}>
                 To :
               </Typography>
-              <Typography variant="body1">Umang Patel</Typography>
-              <Typography variant="body1">umang@gmail.com</Typography>
+              <Typography variant="body1">{rideData.rider_name}</Typography>
+              <Typography variant="body1">{rideData.rider_email}</Typography>
               <Typography variant="body1">Rider</Typography>
             </Box>
           </Paper>

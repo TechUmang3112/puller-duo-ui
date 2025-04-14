@@ -25,18 +25,30 @@ import Link from "next/link";
 import Logo from "@/app/(DashboardLayout)/layout/shared/logo/Logo";
 import { useSelector } from "@/store/hooks";
 import { AppState } from "@/store/store";
+import { get } from "@/services/api.service";
+import { nUser } from "@/constants/network";
 
 const InvoiceDetail = () => {
+  const [rideData, setRideData] = useState<any>({ isPending: true });
   const { invoices } = useContext(InvoiceContext);
   const [selectedInvoice, setSelectedInvoice]: any = useState(null);
   const userState = useSelector((state: AppState) => state.userReducer);
 
   useEffect(() => {
+    getCurrentRide();
+
     // Set the first invoice as the default selected invoice initially
     if (invoices.length > 0) {
       setSelectedInvoice(invoices[0]);
     }
   }, [invoices]);
+
+  async function getCurrentRide() {
+    const rideData = await get(nUser.currentRide, {
+      userId: localStorage.getItem("userId"),
+    });
+    setRideData(rideData);
+  }
 
   // Get the last part of the URL path as the billFrom parameter
   const pathName = usePathname();
@@ -64,6 +76,14 @@ const InvoiceDetail = () => {
       : "Invalid Date"
     : format(new Date(), "EEEE, MMMM dd, yyyy");
 
+  if (rideData.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (rideData.isActiveCurrentRide == false) {
+    return <div>No Active ride is found</div>;
+  }
+
   return (
     <>
       <Stack
@@ -80,13 +100,18 @@ const InvoiceDetail = () => {
             },
           }}
         >
-          <Typography variant="h5"># {selectedInvoice.id}</Typography>
           <Box mt={1}>
             <Chip
               size="small"
               color="secondary"
               variant="outlined"
-              label={orderDate}
+              label={
+                rideData.rideTime
+                  ? isValid(parseISO(rideData.rideTime))
+                    ? format(parseISO(rideData.rideTime), "EEEE, MMMM dd, yyyy")
+                    : "Invalid Date"
+                  : format(new Date(), "EEEE, MMMM dd, yyyy")
+              }
             ></Chip>
           </Box>
         </Box>
@@ -162,17 +187,23 @@ const InvoiceDetail = () => {
                 ) => (
                   <TableRow key={index}>
                     <TableCell>
-                      <Typography variant="body1">{order.itemName}</Typography>
+                      <Typography variant="body1">
+                        {rideData.startPlace}
+                      </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body1">{order.unitPrice}</Typography>
+                      <Typography variant="body1">
+                        {rideData.endPlace}
+                      </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body1">{order.units}</Typography>
+                      <Typography variant="body1">
+                        {rideData.distanceInKm}
+                      </Typography>
                     </TableCell>
                     <TableCell align="right">
                       <Typography variant="body1">
-                        {order.unitTotalPrice}
+                        {rideData.timeInMinutes} Minutes
                       </Typography>
                     </TableCell>
                   </TableRow>
@@ -188,7 +219,7 @@ const InvoiceDetail = () => {
             Driver Wage:
           </Typography>
           <Typography variant="body1" fontWeight={600}>
-            {selectedInvoice.totalCost}
+            {rideData.driver_cost}
           </Typography>
         </Box>
         <Box display="flex" justifyContent="end" gap={3} mb={3}>
@@ -196,7 +227,7 @@ const InvoiceDetail = () => {
             Platform fee:
           </Typography>
           <Typography variant="body1" fontWeight={600}>
-            {selectedInvoice.vat}
+            {rideData.platform_fee}
           </Typography>
         </Box>
         <Box display="flex" justifyContent="end" gap={3}>
@@ -204,7 +235,7 @@ const InvoiceDetail = () => {
             Grand Total:
           </Typography>
           <Typography variant="body1" fontWeight={600}>
-            {selectedInvoice.grandTotal}
+            {rideData.platform_fee + rideData.driver_cost}
           </Typography>
         </Box>
       </Box>

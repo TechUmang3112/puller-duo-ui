@@ -1,82 +1,101 @@
 // Imports
+import { useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
-const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
+const Chart: any = dynamic(() => import("react-apexcharts"), { ssr: false });
 import { useTheme } from "@mui/material/styles";
 import DashboardWidgetCard from "../../shared/DashboardWidgetCard";
 import SkeletonEmployeeSalaryCard from "../skeleton/EmployeeSalaryCard";
 import { Box } from "@mui/material";
+import { nAdmin } from "@/constants/network";
+import { get } from "@/services/api.service";
+import { useDispatch, useSelector } from "@/store/hooks";
+import { setMonthlyUsers } from "@/store/admin/AdminReducer";
+import { AppState } from "@/store/store";
 
 interface EmployeeSalaryCardProps {
   isLoading?: boolean;
 }
 
 const EmployeeSalary = ({ isLoading }: EmployeeSalaryCardProps) => {
+  const dispatch = useDispatch();
+  const adminState = useSelector((state: AppState) => state.adminReducer);
+
   // chart color
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const primarylight = theme.palette.grey[100];
 
   // chart
-  const optionscolumnchart: any = {
-    chart: {
-      type: "bar",
-      fontFamily: "'Plus Jakarta Sans', sans-serif;",
-      foreColor: "#adb0bb",
-      toolbar: {
+  const { optionscolumnchart, seriescolumnchart } = useMemo(() => {
+    const options = {
+      chart: {
+        type: "bar",
+        fontFamily: "'Plus Jakarta Sans', sans-serif;",
+        foreColor: "#adb0bb",
+        toolbar: {
+          show: false,
+        },
+        height: 280,
+      },
+      colors: [primary, primary, primary, primary, primary, primary],
+      plotOptions: {
+        bar: {
+          borderRadius: 4,
+          columnWidth: "45%",
+          distributed: true,
+          endingShape: "rounded",
+        },
+      },
+      dataLabels: {
+        enabled: false,
+      },
+      legend: {
         show: false,
       },
-      height: 280,
-    },
-    colors: [
-      primarylight,
-      primarylight,
-      primary,
-      primarylight,
-      primarylight,
-      primarylight,
-    ],
-    plotOptions: {
-      bar: {
-        borderRadius: 4,
-        columnWidth: "45%",
-        distributed: true,
-        endingShape: "rounded",
+      grid: {
+        yaxis: {
+          lines: {
+            show: false,
+          },
+        },
       },
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    legend: {
-      show: false,
-    },
-    grid: {
-      yaxis: {
-        lines: {
+      xaxis: {
+        categories: adminState.monthlyUsers?.map((el) => [el.monthName]),
+        axisBorder: {
           show: false,
         },
       },
-    },
-    xaxis: {
-      categories: [["Apr"], ["May"], ["June"], ["July"], ["Aug"], ["Sept"]],
-      axisBorder: {
-        show: false,
+      yaxis: {
+        labels: {
+          show: false,
+        },
       },
-    },
-    yaxis: {
-      labels: {
-        show: false,
+      tooltip: {
+        theme: theme.palette.mode === "dark" ? "dark" : "light",
       },
-    },
-    tooltip: {
-      theme: theme.palette.mode === "dark" ? "dark" : "light",
-    },
-  };
-  const seriescolumnchart = [
-    {
-      name: "",
-      data: [20, 15, 30, 25, 10, 15],
-    },
-  ];
+    };
+
+    const series = [
+      {
+        name: "",
+        data: adminState.monthlyUsers?.map((el) => el.count),
+      },
+    ];
+
+    return { optionscolumnchart: options, seriescolumnchart: series };
+  }, [adminState.monthlyUsers, primary, primarylight, theme.palette.mode]);
+
+  useEffect(() => {
+    getMonthlyUsers();
+  }, []);
+
+  async function getMonthlyUsers() {
+    const response = await get(nAdmin.monthlyUsers);
+    if (response.list != null && response.list != undefined) {
+      console.log(response.list.map((el: any) => [el.monthName]));
+      dispatch(setMonthlyUsers(response.list));
+    }
+  }
 
   return (
     <>

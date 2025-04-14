@@ -1,19 +1,32 @@
 // Imports
-import React from "react";
+import React, { useEffect } from "react";
 import {
   IconBus,
-  IconCalendar,
   IconCar,
   IconListDetails,
-  IconStack,
   IconUser,
 } from "@tabler/icons-react";
 import { AppState } from "@/store/store";
-import { useSelector } from "@/store/hooks";
+import { useDispatch, useSelector } from "@/store/hooks";
 import { Box, Grid, Stack, Typography } from "@mui/material";
+import { get } from "@/services/api.service";
+import { nAdmin } from "@/constants/network";
+import { setUserCount } from "@/store/admin/AdminReducer";
 
 function UserInsights() {
-  const rideState = useSelector((state: AppState) => state.rideReducer);
+  const adminState = useSelector((state: AppState) => state.adminReducer);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    getUserCounts();
+  }, []);
+
+  async function getUserCounts() {
+    const response = await get(nAdmin.userIngiths);
+    if (response.count) {
+      dispatch(setUserCount(response.count));
+    }
+  }
 
   return (
     <Box mb={8}>
@@ -24,7 +37,7 @@ function UserInsights() {
             bgcolor="primary.light"
             p={3}
             onClick={() => {
-              window.location.href = "/user/myRides";
+              window.location.href = "/user/list";
             }}
             sx={{ cursor: "pointer" }}
           >
@@ -49,7 +62,7 @@ function UserInsights() {
               <Box>
                 <Typography>Total</Typography>
                 <Typography fontWeight={500}>
-                  {rideState.count.total} Users
+                  {adminState.count.total} Users
                 </Typography>
               </Box>
             </Stack>
@@ -62,7 +75,7 @@ function UserInsights() {
             bgcolor="warning.light"
             p={3}
             onClick={() => {
-              window.location.href = "/user/upcomingRides";
+              window.location.href = "/manage/drivers";
             }}
             sx={{ cursor: "pointer" }}
           >
@@ -87,7 +100,7 @@ function UserInsights() {
               <Box>
                 <Typography>Total</Typography>
                 <Typography fontWeight={500}>
-                  {rideState.count.upcoming} Drivers
+                  {adminState.count.driver} Drivers
                 </Typography>
               </Box>
             </Stack>
@@ -99,7 +112,9 @@ function UserInsights() {
           <Box
             bgcolor="secondary.light"
             p={3}
-            onClick={() => {}}
+            onClick={() => {
+              window.location.href = "/manage/riders";
+            }}
             sx={{ cursor: "pointer" }}
           >
             <Stack direction="row" gap={2} alignItems="center">
@@ -123,7 +138,7 @@ function UserInsights() {
               <Box>
                 <Typography>Total</Typography>
                 <Typography fontWeight={500}>
-                  {rideState.count.current} Riders
+                  {adminState.count.rider} Riders
                 </Typography>
               </Box>
             </Stack>
@@ -135,7 +150,9 @@ function UserInsights() {
           <Box
             bgcolor="success.light"
             p={3}
-            onClick={() => {}}
+            onClick={() => {
+              window.location.href = "/manage/totalRides";
+            }}
             sx={{ cursor: "pointer" }}
           >
             <Stack direction="row" gap={2} alignItems="center">
@@ -159,7 +176,7 @@ function UserInsights() {
               <Box>
                 <Typography>Total</Typography>
                 <Typography fontWeight={500}>
-                  {rideState.count.completed} Rides
+                  {adminState.count.rides} Rides
                 </Typography>
               </Box>
             </Stack>

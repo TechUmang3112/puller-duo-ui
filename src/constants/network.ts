@@ -46,4 +46,5 @@ export const nAdmin = {
   monthlyUsers: baseUrl + "admin/monthlyUsers",
   yearlyUsers: baseUrl + "admin/yearlyUsers",
   monthlyComparision: baseUrl + "admin/monthlyComparison",
+  userIngiths: baseUrl + "admin/userInsights",
 };

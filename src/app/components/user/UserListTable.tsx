@@ -1,7 +1,7 @@
 "use client";
 
 // Imports
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // Added useEffect
 import {
   TableContainer,
   Table,
@@ -42,6 +42,8 @@ import {
   IconChevronsLeft,
   IconChevronsRight,
 } from "@tabler/icons-react";
+import { nAdmin } from "@/constants/network";
+import { get } from "@/services/api.service";
 
 export interface PaginationDataType {
   id: string;
@@ -51,29 +53,10 @@ export interface PaginationDataType {
   isActive: boolean;
 }
 
-export const basicsTableData: PaginationDataType[] = [
-  {
-    id: "1",
-    Name: "Rahil Patel",
-    Email: "rahil.driver@gmail.com",
-    DocumentStatus: "Approved",
-    isActive: true,
-  },
-  {
-    id: "2",
-    Name: "Dhruv Patel",
-    Email: "dhruv.driver@gmail.com",
-    DocumentStatus: "Rejected",
-    isActive: false,
-  },
-];
-
-const basics = basicsTableData;
-
 const columnHelper = createColumnHelper<PaginationDataType>();
 
 const UserListTable = () => {
-  const [data, setData] = useState(() => [...basics]);
+  const [data, setData] = useState<PaginationDataType[]>([]); // Initialize as empty array
   const [columnFilters, setColumnFilters] = useState<any>([]);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [currentEdit, setCurrentEdit] = useState<{
@@ -81,6 +64,11 @@ const UserListTable = () => {
     field: "Name" | "Email";
     value: string;
   } | null>(null);
+  const [loading, setLoading] = useState(true); // Add loading state
+
+  useEffect(() => {
+    getUsers();
+  }, []);
 
   const handleEditClick = (
     id: string,
@@ -213,6 +201,30 @@ const UserListTable = () => {
     debugHeaders: true,
     debugColumns: false,
   });
+
+  async function getUsers() {
+    setLoading(true);
+    const response = await get(nAdmin.users);
+    if (response.list) {
+      // Map the API response to match your data structure
+      const mappedData = response.list.map((user: any) => ({
+        id: user._id.toString(),
+        Name: user.name || "N/A",
+        Email: user.email || "N/A",
+        DocumentStatus:
+          user.isAadhaarApproved || user.isDriverLicenceApproved
+            ? "Approved"
+            : "Not uploaded",
+        isActive: user.isActive || false,
+      }));
+      setData(mappedData);
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return <Typography>Loading users...</Typography>;
+  }
 
   return (
     <>

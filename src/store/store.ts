@@ -15,6 +15,7 @@ import UserProfileReducer from "./apps/userProfile/UserProfileSlice";
 import BlogReducer from "./apps/blog/BlogSlice";
 import userReducer from "./user/UserReducer";
 import rideReducer from "./ride/RideReducer";
+import adminReducer from "./admin/AdminReducer";
 
 const persistConfig = {
   key: "root",
@@ -23,6 +24,7 @@ const persistConfig = {
 
 export const store = configureStore({
   reducer: {
+    adminReducer: adminReducer,
     userReducer: userReducer,
     rideReducer: rideReducer,
     counter: counterReducer,
@@ -42,6 +44,7 @@ export const store = configureStore({
 });
 
 const rootReducer = combineReducers({
+  adminReducer: adminReducer,
   userReducer: userReducer,
   rideReducer: rideReducer,
   counter: counterReducer,

@@ -34,3 +34,10 @@ export const nGoogle = {
   searchPlaces: baseUrl + "thirdParty/google/searchPlaces",
   measureDistance: baseUrl + "thirdParty/google/measureDistance",
 };
+
+export const nAdmin = {
+  users: baseUrl + "admin/users",
+  drivers: baseUrl + "admin/drivers",
+  riders: baseUrl + "admin/riders",
+  updateUserStatus: baseUrl + "admin/updateUserStatus",
+};

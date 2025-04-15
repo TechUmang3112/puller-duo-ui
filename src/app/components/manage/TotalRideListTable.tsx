@@ -16,6 +16,7 @@ import {
   Divider,
   IconButton,
   Chip,
+  Rating,
 } from "@mui/material";
 import { Stack } from "@mui/system";
 import DownloadCard from "@/app/components/shared/DownloadCard";
@@ -39,6 +40,7 @@ import {
 import { nAdmin } from "@/constants/network";
 import { get } from "@/services/api.service";
 import { getFormattedDateAndTime } from "@/services/date.service";
+import Disabled from "../ui-components/rating/Disabled";
 
 export interface PaginationDataType {
   "Start Point": string;
@@ -47,6 +49,8 @@ export interface PaginationDataType {
   Status: string;
   Date: string;
   Time?: string;
+  Rating?: number;
+  Feedback?: string;
 }
 
 const columnHelper = createColumnHelper<PaginationDataType>();
@@ -127,6 +131,20 @@ const columns = [
       />
     ),
   }),
+
+  columnHelper.accessor("Rating", {
+    header: () => "Rating",
+    cell: (info) => <Rating name="disabled" value={info.getValue()} disabled />,
+  }),
+
+  columnHelper.accessor("Feedback", {
+    header: () => "Feedback",
+    cell: (info) => (
+      <Typography variant="subtitle1" color="textSecondary">
+        {info.getValue()}
+      </Typography>
+    ),
+  }),
 ];
 
 const TotalRideListTable = () => {
@@ -179,6 +197,8 @@ const TotalRideListTable = () => {
               : ride.status == "5"
               ? "Completed"
               : "Unknown",
+          Rating: ride.rating ?? 0,
+          Feedback: ride.feedback ?? "",
         }));
         setData(formattedData);
       }

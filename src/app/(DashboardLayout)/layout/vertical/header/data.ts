@@ -82,6 +82,12 @@ const getProfileLinks = () => {
         title: "My Rides",
         subtitle: "History & Upcoming Rides",
         icon: "/images/svgs/icon-tasks.svg",
+      },
+      {
+        href: "/user/paymentHistory",
+        title: "My Payments",
+        subtitle: "Payment history",
+        icon: "/images/svgs/icon-master-card.svg",
       }
     );
   }

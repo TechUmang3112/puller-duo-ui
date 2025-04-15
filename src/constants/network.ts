@@ -20,6 +20,7 @@ export const nUser = {
   changePassword: baseUrl + "user/changePassword",
   notifications: baseUrl + "user/notifications",
   currentRide: baseUrl + "user/currentRide",
+  payments: baseUrl + "user/payments",
 };
 
 export const nDriver = {
@@ -32,6 +33,8 @@ export const nRider = {
   findRide: baseUrl + "rider/findRide",
   acceptRide: baseUrl + "rider/acceptRide",
   initiatePayment: baseUrl + "rider/initiatePayment",
+  syncPayment: baseUrl + "rider/syncPayment",
+  rateRide: baseUrl + "rider/rateRide",
 };
 
 export const nGoogle = {

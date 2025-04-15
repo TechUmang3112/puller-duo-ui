@@ -109,7 +109,8 @@ const MonthlyEarnings = ({ isLoading }: MonthlyearningsCardProps) => {
                 )}
               </Avatar>
               <Typography variant="subtitle2" fontWeight="600">
-                +6%
+                {adminState.monthlyComparision.trend == "negative" ? "-" : "+"}
+                {adminState.monthlyComparision.growthPercentage ?? 0}
               </Typography>
               <Typography variant="subtitle2" color="textSecondary">
                 last month
